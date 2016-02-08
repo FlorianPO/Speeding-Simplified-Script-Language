@@ -1,0 +1,17 @@
+(*
+ * A Grako grammar for simple regular expression;
+
+   Because whitespace is significant in regular expressions,
+   all rule names start with an uppercase letter so whitespace
+   is not skipped when invoking them;
+ *)
+
+START = EXPR $ ;
+
+EXPR = TYPE NOM DECL ;
+
+TYPE = 'int' | 'float' ;
+
+NOM = 'a' | 'b' ;
+
+DECL = '=' 'c' ;
