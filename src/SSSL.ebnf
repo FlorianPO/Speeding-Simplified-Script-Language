@@ -6,12 +6,14 @@
    is not skipped when invoking them;
  *)
 
-START = EXPR $ ;
+START = DECL:DECL $ ;
 
-EXPR = TYPE NOM DECL ;
+DECL = TYPE:TYPE EXPR:EXPR '=' EXPR:EXPR ;
+
+EXPR = NOM | val ;
 
 TYPE = 'int' | 'float' ;
 
-NOM = 'a' | 'b' ;
+NOM = 'a' | 'b' | 'c' ;
 
-DECL = '=' 'c' ;
+val = /[0-9]+/ ;

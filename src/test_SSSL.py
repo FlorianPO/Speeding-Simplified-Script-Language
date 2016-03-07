@@ -13,13 +13,11 @@ from grako.codegen import codegen
 import fileinput
 
 def main():
-	parser = SSSLParser()
+	parser = SSSLParser(trace=False)
 	
 	f = open('programme.sssl', 'r')
 	
 	ast = parser.parse(f.read(), rule_name='START')
-	print(ast)
-	print()
 	print(json.dumps(ast, indent=2))
 
 if __name__ == '__main__':
