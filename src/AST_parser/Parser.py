@@ -3,28 +3,64 @@
 from __future__ import (absolute_import, division, print_function, unicode_literals)
 
 import sys
-import json
+import fileinput
+
+from Exceptions import NoInstructionLeft
+from Exceptions import ErrorParsing
+from Exceptions import Logger
 
 import Instructions
 
-import fileinput
-
-# Return True if a character is useless
+# Return True if the character is useless
+ignore_list = [' ', '\n', ':']
 def ignore(c):
-    if c == ' ' or c == '\n' or c == ':':
-        return True
-    return False 
+    return (c in ignore_list) 
 
+# Return the next string
+def next_string(H):
+    while H.hasNext():
+        c = H.next()
+        if ignore(c):   
+            continue
+        if c == '"':
+            break
+
+    string = ""
+    while H.hasNext():
+        c = H.next()
+        if c == '"':
+            if len(string) > 0:
+                break
+            continue
+        string += c
+
+    Logger._s.log("-> " + string)
+    return string
+
+# Consume the given string
 def eat(string, H):
     i=0
     while H.hasNext():
         c = H.next()
         if (c != string[i]):
-            print("Impossible de consommer le caractère %s" % c)
-            exit()
+            Logger._s.log("Impossible to consume character " + c + " in string " + string, 1)
+            raise ErrorParsing()
         i+=1
         if i >= len(string):
             break
+
+# Check the next character with string, else handler is unchanged 
+def check(string, H):
+    i = H.i # save state
+    while H.hasNext():
+        c = H.next()
+        if (c == string[0]):
+            return True
+        if (c == ignore):
+            continue
+        else:
+            H.i = i # restore state
+            return False
 
 # Find the next occurence of a character if possible, else handler is unchanged 
 def find(string, H):
@@ -39,55 +75,91 @@ def find(string, H):
             H.i = i # restore state
             return False
 
+# ___________________________________________________
 
-# Return the following string
-def parse_string(H):
-    while H.hasNext():
-        c = next()
-        if ignore(c):   
-            continue
-        if c == '"':
-            break
+node_list = []
+def create_instruction(string, H):
+    global instr_dict
 
-    string = ""
-    while H.hasNext():
-        c = next()
-        if c == '"':
-            if len(string > 0):
-                break
-            continue
-        string += c
+    instruction = instr_dict[string]()
+    node_list.append(instruction)
+    
+    while (not instruction.isComplete()): # feed instruction
+        instruction.discoverToken(next_string(H))
+        instruction.feedToken(next_string(H))
 
-    return string
+
+# ___________________________________________________
 
 # Parse the whole AST
 def parse(H):
-    while H.hasNext():
-        string = parse_string(H)
-        create_instruction(string, H)
+    Logger._s.log("Begin of parsing...")
 
-def create_instruction(string, H):
-    eat(": ", H)
+    string = "_none_"
+    while H.hasNext(): # main loop
+        try:
+            string = next_instruction(H)
+            create_instruction(string, H)
+        except NoInstructionLeft:
+            break # End of file
+        except ErrorParsing:
+            Logger._s.printLog()
+            exit()
 
-    bool = False
-    if find("[", H):
-        bool = True
+    Logger._s.log("End of file...")
+    Logger._s.printLog()
+    # TODO code generation
+
+first_call = True
+instruction_lister = None
+# Return the next instruction ("DECL", ...)
+def next_instruction(H):
+    global first_call
+    global instruction_lister
+
+    string = "_none_"
+
+    if ((not first_call) and (not check(",", H))):
+        raise NoInstructionLeft()
+
+    if (instruction_lister == None):
+        string = next_string(H)
+        eat(": ", H)
+        if (H.next() == "["): # list
+            instruction_lister = Lister(string)
     else:
-        find("{", H)
+        if (check(",", H)):
+            string = instruction_lister.name
+        elif (check("]", H)):
+            instruction_lister = None
+            string = next_instruction(H) # restart process
+        else:
+            Logger._s.log("Impossible to find the next token in list or end of list", 1)
+            raise ErrorParsing()
 
-    while True:
-        if string == "DECL":
-            node_list.append(Declaration())
-        
-        while not find("}", H):
-            string = parse_string(H)
-            # eat(": ", H)
-            # if find("[", H):
-            #TODO
-        if not bool:
-            break
+    first_call = False
+    return string
 
-node_list = []
+# Program parser
+class Handler:
+    def __init__(self, string, i=0):
+        self.AST = string; # the whole SSSL program
+        self.i = i; # index in string
+        self.node_list = [] # abstract tree
+
+    def next(self): # retrieve next character
+        self.i += 1
+        return self.AST[self.i-1]
+
+    def nextTest(self): # retrieve next character without consuming it
+         return self.AST[self.i]
+
+    def hasNext(self): # not EOF
+        return self.i < len(self.AST)
+
+class Lister:
+    def __init__(self, name):
+        self.name = name
 
 def main():
     f = open('AST.txt', 'r')
@@ -97,16 +169,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-class Handler:
-    def __init__(self, string, i=0):
-        self.AST = string;
-        self.i = i;
-        self.node_list = []
-
-    def next(self):
-        self.i += 1
-        return self.AST[self.i-1]
-
-    def hasNext(self):
-        return self.i < len(self.AST)
