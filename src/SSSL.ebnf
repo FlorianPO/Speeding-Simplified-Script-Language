@@ -1,19 +1,26 @@
-(*
- * A Grako grammar for simple regular expression;
 
-   Because whitespace is significant in regular expressions,
-   all rule names start with an uppercase letter so whitespace
-   is not skipped when invoking them;
- *)
+START = DECL:DECL AFFECT:AFFECT $ ;
 
-START = DECL:DECL $ ;
+DECL = TYPE:type NAME:nom '=' EXPR:expr ;						(* Instruction *)
 
-DECL = TYPE:TYPE EXPR:EXPR '=' EXPR:EXPR ;
+AFFECT = NAME:nom '=' EXPR:expr ;										(* Instruction *)
 
-EXPR = NOM | val ;
+expr = object~ | f_nom~ | f_val ;	 	
 
-TYPE = 'int' | 'float' ;
+object = CLASS_N:nom '(' ARGS:args ')' ;
 
-NOM = 'a' | 'b' | 'c' ;
+args = EXPR:expr ',' EXPR:expr~ | EXPR:expr ;									(* | FUNC *)
+
+(* ___ *)
+
+type = ('int'~ | 'float') ;
+
+nom = /[a-z]+/ ;
 
 val = /[0-9]+/ ;
+
+f_type = TYPE:type ;
+
+f_nom = NAME:nom ;
+
+f_val = VAL:val ;
