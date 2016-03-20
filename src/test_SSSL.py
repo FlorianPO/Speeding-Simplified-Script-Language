@@ -10,10 +10,8 @@ import json
 import grako
 from grako.codegen import codegen
 
-import fileinput
-
 def main():
-	parser = SSSLParser(trace=False)
+	parser = SSSLParser(trace=True, nameguard=False)
 	
 	f = open('programme.sssl', 'r')
 	

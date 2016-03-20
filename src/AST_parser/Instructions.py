@@ -2,18 +2,13 @@
 
 import builtins
 
-from Exceptions import ErrorParsing
-from Logger import Logger
-
-from Handler import Handler
+from Exceptions import *
 
 # Everything is a node
 class Node:
-    def __init__(self):
-        self.node_name = "_none_"
-
-    def isTerminal(self): # pure virtual
-        raise NotImplementedError("isTerminal interface method, problem...")
+    def __init__(self, data):
+        self.node_name = revDict(data.all_dict, self.__class__) # get the right name
+        self.data = data
 
     # Search for content
     def fill(self): # pure virtual
@@ -21,25 +16,19 @@ class Node:
 
     def getName(self):
         return self.node_name
-
-class Terminal(Node):
-    def isTerminal(self):
-        return True
-
-class nonTerminal(Node):
-    def isTerminal(self):
-        return False
+    def __repr__(self):
+        return self.__str__()
 
 # NON TERMINAL ____________________________
-class Instruction(nonTerminal):
-    def create(string):
-        return instr_dict[string]()
+class Instruction(Node):
+    def create(string, data):
+        return data.instr_dict[string](data)
 
     def __init__(self, token_list):
-        self.node_name = revDict(instr_dict, self.__class__) # get the right name in instruction dictinary
         self.tokens = token_list # list of tokens expected for instruction
         self.tokens_index = 0 # token list index
-    
+        self.fill()
+
     def fill(self):
         while (not self.isComplete()): # fill instruction
             self.checkToken() # _/ ! \_ AST could become smaller
@@ -49,151 +38,200 @@ class Instruction(nonTerminal):
 
     # Check if the token corresponds to the expected tokens
     def checkToken(self):
-        token = Handler._s.next_string()
+        token = self.data.Handler.next_string()
         if (not (token == self.tokens[self.tokens_index].getName())):
-            Logger._s.logError("Error, unable to match token "+  token + " in discoverToken, waiting for " + self.tokens[self.tokens_index].getName())
+            self.data.Logger.logError("Error, unable to match token "+  token + " in discoverToken, waiting for " + self.tokens[self.tokens_index].getName())
             raise ErrorParsing()
 
     def isComplete(self):
         return (self.tokens_index >= len(self.tokens))
 
     def __str__(self):
-        return self.getName() + ": " + self.tokens.__str__()
+        return self.node_name + ": " + self.tokens.__str__()
 
 class Declaration(Instruction):
-    def __init__(self):
-        Instruction.__init__(self,  [Type(), Name(True), Expression()]) # int v = 2 + 4
+    def __init__(self, data):
+        Node.__init__(self, data)
+        type = Type(data)
+        name = Name(data, True)
+        expr = Expression(data)
+        Instruction.__init__(self, [type, name, expr]) # int v = 2 + 4
+        
+        name.setType(type)
+
+        data.Block.add(name.__str__(), expr)
+
+        # TODO test compability
 
 class Affectation(Instruction):
-    def __init__(self):
-        Instruction.__init__(self,  [Name(), Value()]) # v = 2 + 4
+    def __init__(self, data):
+        Node.__init__(self, data)
+        name = Name(data)
+        expr = Expression(data)
+        Instruction.__init__(self, [name, expr]) # v = 2 + 4
+        data.Block.modify(name.__str__(), expr)
+        # TODO test compability
 
 # UNDEFINED _______________________________
 class Arguments(Instruction):
     pass # TODO
 
-# TERMINAL ________________________________
-class Expression(Terminal):
-    def __init__(self):
-        self.node_name = revDict(expr_dict, self.__class__)
-
-    def fill(self):
-        expr = findExpr()
-        self.__class__ = expr.__class__ # change __class__: Expression(4 + 4) -> Value(8)
-        self.__dict__.update(expr.__dict__) # copy attributes
-
-class Type(Expression):
-    def __init__(self, keyword = None):
-        Expression.__init__(self)
+class Type(Node):
+    def __init__(self, data, keyword = None):
+        Node.__init__(self, data)
         if (keyword == None):
             self.keyword = "_none_" # int, float, ...
         else:
             self.keyword = keyword
 
     def fill(self):
-        token = Handler._s.next_string()
-        if (isTypeKeyword(token)): # check keyword
+        token = self.data.Handler.next_string()
+        if (token in self.data.type_list): # check keyword
             self.keyword = token
         else:
-            Logger._s.logError("Error: " + token + " is not a known type")
+            self.data.Logger.logError("Error: " + token + " is not a known type")
             raise ErrorParsing()
 
     def __str__(self):
         return self.keyword
-    def __repr__(self):
-        return self.__str__()
+
+# Expression ________________________________
+class Expression(Node):
+    def __init__(self, data):
+        Node.__init__(self, data)
+        self.type = None
+        self.value_s = "_none_" # string, literal value
+
+    def fill(self):
+        expr = findExpr(self.data)
+        self.__class__ = expr.__class__ # change __class__: Expression(4 + 4) -> Add(4, 4)
+        self.__dict__.update(expr.__dict__) # copy attributes
+
+    def getType(self):
+        return self.type
+    def setType(self, type):
+        self.type = type
 
 class Name(Expression):
-    def __init__(self, b_decl = False):
-        Expression.__init__(self)
-        self.name = "_none_" # my_var1, ...
+    def __init__(self, data, b_decl = False):
+        Expression.__init__(self, data)
         self.decl = b_decl; # declaration or not
 
-    def fill(self):
-        token = Handler._s.next_string()
-        if (not self.decl): # check environment
-            if (not checkEnv(token)):
-                Logger._s.logError("Error: " + token + " is not known")
-                raise ErrorParsing()
-        self.name = token
+    def fill(self):  
+        token = self.data.Handler.next_string()
+        if (not self.decl): # not a declaration
+            expr = self.data.Block.get(token)
+            if (expr == None):
+                self.data.Logger.logError("Error: " + token + " is not known")
+                raise ErrorEnvironment()
+            self.type = expr.getType()
+        self.value_s = token
 
     def __str__(self):
-        return self.name
-    def __repr__(self):
-        return self.__str__()
+        return self.value_s
 
 class Value(Expression):
-    def __init__(self):
-        Expression.__init__(self)
-        self.val = "_none_" # 8, ...
-        self.type = "_none_" # Type(int), ...
+    def __init__(self, data):
+        Expression.__init__(self, data)
 
     def fill(self):
-        token = Handler._s.next_string()
-        self.type = findType(token) # find type
-        self.val = token
+        token = self.data.Handler.next_string()
+        self.type = findType(self.data, token) # find type
+        self.value_s = token
 
     def __str__(self):
-        return self.type + " " + self.val
+        return self.value_s
     def __repr__(self):
         return self.__str__()
 
-# LISTS ___________________________________
-builtins.instr_dict = {"DECL": Declaration, "AFFECT": Affectation} # TODO complete
-builtins.type_list = ["int", "float"] # TODO complete
-builtins.expr_dict = {"EXPR" : Expression, "TYPE": Type, "NAME": Name, "VAL" : Value} # TODO complete
+# OPERATOR ________________________________
+class Operator(Expression):
+    def __init__(self, data):
+        Node.__init__(self, data)
+        self.expr1 = None
+        self.expr2 = None
 
+    def setLeftExpr(self, expr):
+        self.expr1 = expr
+    def setRightExpr(self, expr):
+        self.expr2 = expr
+
+    def resolveType(self):
+        # TODO
+        pass
+
+class Add(Operator):
+    def __init__(self, data):
+        Operator.__init__(self, data)
+
+    def __str__(self):
+        return self.expr1.__str__() + " + " + self.expr2.__str__()
+
+# TODO
+class Sub(Operator):
+    pass
+class Mul(Operator):
+    pass
+class Div(Operator):
+    pass
+
+# FUNCTIONS _______________________________
 def revDict(dict, value):
     for k, v in dict.items():
         if v == value:
             return k
 
-# FUNCTIONS _______________________________
-# Check if the given string match a type keyword such as "int"
-def isTypeKeyword(string):
-    return (string in type_list)
-
-# Check if a name var exists in the environment (return true if valid)
-def checkEnv(string):
-    # TODO
-    return True
-
 # Find the best matching type of a given value, ex: 1.5 -> float
-def findType(string):
+def findType(data, string):
     if (string.find('.') >= 0):
-        return Type("float")
-    return Type("int")
+        return Type(data, "float")
+    return Type(data, "int")
+
+def findValue(string, type):
+    pass
 
 # Return the true expression object (such as Name, Value, Type, ...)
-def findExpr():
+def findExpr(data):
     expr = None # expression
 
-    if (Handler._s.check("[")): # list
+    if (data.Handler.check("[")): # list
         expression_list = []
         operator_list = []
 
         b_operator = False
-        while not Handler._s.check("]"):
-            string = Handler._s.next_string()
-
+        while not (data.Handler.check("]")):
+            string = data.Handler.next_string()
             if (not b_operator):
-                expr = expr_dict[string]()
+                expr = data.expr_dict[string](data)
                 expression_list.append(expr)
                 expr.fill()
             else:
-                operator_list.append(string)
+                oper = data.oper_dict[string](data)
+                operator_list.append(oper)
             b_operator = not b_operator
 
-        expr = factoriseExpr(expression_list, operator_list)
+        expr = factoriseExpr(data, expression_list, operator_list)
     else: # single expression
-        expr = expr_dict[string]()
-        expression_list.append(expr)
+        string = data.Handler.next_string()
+        expr = data.expr_dict[string](data)
         expr.fill()
     
     return expr
 
-def factoriseExpr(expression_list, operator_list):
-   return None
+# ADD(4, ADD(4, 4))
+def factoriseExpr(data, expression_list, operator_list):
+    expr = None
+    if (len(operator_list) > 0):
+        expr = operator_list[0]
+        expr.setLeftExpr(expression_list[0])
+        del expression_list[0]
+        del operator_list[0]
+        expr.setRightExpr(factoriseExpr(data, expression_list, operator_list))
+    else:
+        expr = expression_list[0]
+
+    return expr
+
 
 
     

@@ -3,50 +3,49 @@
 from __future__ import (absolute_import, division, print_function, unicode_literals)
 
 import sys
-import fileinput
+from Exceptions import *
 
-from Exceptions import NoInstructionLeft
-from Exceptions import ErrorParsing
-from Logger import Logger
-
-from Block import MainBlock
-from Handler import Handler
-
-from Instructions import Instruction
+from Data import Data
+import Go
 
 # Parse the whole AST
-def parse(current_block):
-    while (Handler._s.hasNext()): # read lines
+def parse(data):
+    data.Handler.check("[")
+    while (data.Handler.hasNext()): # read lines
         try:
-            string = current_block.next_line()
-            create_instruction(string)
+            instruction = data.Block.nextInstruction()
+
+            data.Logger.logAST(instruction)
         except NoInstructionLeft:
             break # End of file
-        except ErrorParsing:
-            Logger._s.printAllLog()
+        except:
+            data.Logger.printAllLog()
             exit()
 
-def create_instruction(string):
-    global instr_dict
-
-    instruction = Instruction.create(string) # Create instrucion node
-    instruction.fill()
-      
-    Logger._s.logAST(instruction)
-
 def main():
-    f = open('AST.txt', 'r')
+    f = open('AST', 'r')
 
-    Handler._s.setAST(f.read()) # Give string to handler
+    data = Data()
+    data.Handler.setAST(f.read()) # Give string to handler
 
-    Logger._s.log("Begin of parsing...")
-    parse(MainBlock._s) # main process
-    Logger._s.log("End of file...")
+    data.Logger.log("Begin of parsing...")
 
-    Logger._s.printLogAST()
+    data.Block = data.MainBlock
+    parse(data) # main process
+
+    data.Logger.log("End of file...")
+
+    data.Logger.printAllLog()
     print("")
-    Logger._s.printAllLog()
+    print("Result:")
+    data.Logger.printLogAST()
     print("")
+    print("Go")
+
+    Go.init()
+    for instr in data.MainBlock.instr_list:
+        print(instr.__go__())
+    
 
     # TODO code generation
 

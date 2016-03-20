@@ -1,4 +1,4 @@
-class LoggerCore:
+class Logger:
     def __init__(self, name, trace=False):
         self.trace = trace
         self.name = name
@@ -25,6 +25,3 @@ class LoggerCore:
     def printLogError(self):    self._print(self.logerror_list)
     def printLogAST(self):      self._print(self.logast_list)
     def printAllLog(self):      self._print(self.alllog_list)
-
-class Logger:
-    _s = LoggerCore("Default logger", True) # static

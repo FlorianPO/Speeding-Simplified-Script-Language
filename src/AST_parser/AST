@@ -1,0 +1,24 @@
+[
+  {
+    "DECL": null,
+    "TYPE": "int",
+    "NAME": "a",
+    "EXPR": [
+      {
+        "VAL": "4"
+      },
+      "+",
+      {
+        "VAL": "4"
+      }
+    ]
+  },
+  {
+    "DECL": null,
+    "TYPE": "int",
+    "NAME": "b",
+    "EXPR": {
+      "NAME": "a"
+    }
+  }
+]

@@ -1,11 +1,15 @@
 
-START = DECL:DECL AFFECT:AFFECT $ ;
+START = { INSTR } $ ;
 
-DECL = TYPE:type NAME:nom '=' EXPR:expr ;						(* Instruction *)
+INSTR = DECL~ | AFFECT ;
 
-AFFECT = NAME:nom '=' EXPR:expr ;										(* Instruction *)
+DECL = DECL:() TYPE:type NAME:nom '=' EXPR:expr ;						(* Instruction *)
 
-expr = object~ | f_nom~ | f_val ;	 	
+AFFECT = AFFECT:() NAME:nom '=' EXPR:expr ;									(* Instruction *)
+
+expr = t_expr '+' expr | t_expr ;
+
+t_expr = object~ | f_nom~ | f_val ;	 	
 
 object = CLASS_N:nom '(' ARGS:args ')' ;
 

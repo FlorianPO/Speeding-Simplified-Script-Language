@@ -1,46 +1,53 @@
+from Exceptions import *
+import Instructions # circular import
+
 from Logger import Logger
 from Handler import Handler
 
-from Exceptions import NoInstructionLeft
-from Exceptions import ErrorParsing
-
+# Define a block of instructions, and so an environment
 class Block:
-    def __init__(self, parent = None):
-        self.string_listed = None
-        self.parent = parent # super environment
+    def __init__(self, parent, data):
+        self.data = data
         self.instr_list = [] # instructions inside the block
+        self.env_dict = {}
+        self.setParentEnv(parent) # super environment
 
-    def setParentEnv(parent):
+    def setParentEnv(self, parent):
         self.parent = parent
 
+    def add(self, name, expr):
+        if (self.get(name) == None):
+            self.env_dict[name] = expr
+        else:
+            self.data.Logger.logError("Error: " + name + " already exists")
+            raise ErrorDeclaration()
+
+    def modify(self, name, expr):
+        if (name in self.env_dict):
+            self.env_dict[name] = expr
+        elif (self.parent != None):
+            self.parent.modify(name, expr)
+        else:
+            self.data.Logger.logError("Error: " + name + " doesn't exist")
+            raise ErrorEnvironment()
+
+    def get(self, name):
+        value = None
+        if (name in self.env_dict):
+            value = self.env_dict[name]
+        elif (self.parent != None):
+            value = self.parent.get(name)
+
+        return value
+
     # Return the next line ("DECL", ...)
-    def next_line(self):
-        string = Handler._s.next_string()
+    def nextInstruction(self):
+        string = self.data.Handler.next_string()
 
         if (string == ""):
             raise NoInstructionLeft()
 
-        if (self.string_listed == None):
-            if (Handler._s.check('[')):
-                self.string_listed = string
-        else:
-             if (Handler._s.check(']')):
-                self.string_listed = None
-                self.next_line() # repeat process
-
-        return string
-
-    def _list_line(self, string):
-        while not Handler._s.check("]"):
-            Handler._s.next_string()
-            expr_dict.get(string)
-
-
-# _g: contains global variables, could also contains some initialisation instructions
-class GlobalEnv():
-    _s = Block() # global environment
-
- # _m: main block
-class MainBlock():
-    _s = Block(GlobalEnv._s) # main
-    
+        instr = Instructions.Instruction.create(string, self.data) # create instruction node
+        
+        self.instr_list.append(instr)
+        return instr

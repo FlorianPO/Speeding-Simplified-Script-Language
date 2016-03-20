@@ -1,1 +1,2 @@
-int a = 48
+int a = 4 + 4
+int b = a
