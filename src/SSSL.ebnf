@@ -5,15 +5,17 @@ INSTR = DECL~ | AFFECT ;
 
 DECL = DECL:() TYPE:type NAME:nom '=' EXPR:expr ;						(* Instruction *)
 
-AFFECT = AFFECT:() NAME:nom '=' EXPR:expr ;									(* Instruction *)
+AFFECT = AFFECT:() NAME:nom '=' EXPR:expr ;								(* Instruction *)
 
-expr = t_expr '+' expr | t_expr ;
+expr = t_expr OPER expr | t_expr ;
+
+OPER = '+'~ | '-'~ | '*'~ | '/' ;
 
 t_expr = object~ | f_nom~ | f_val ;	 	
 
 object = CLASS_N:nom '(' ARGS:args ')' ;
 
-args = EXPR:expr ',' EXPR:expr~ | EXPR:expr ;									(* | FUNC *)
+args = EXPR:expr ',' EXPR:expr~ | EXPR:expr ;							(* | FUNC *)
 
 (* ___ *)
 

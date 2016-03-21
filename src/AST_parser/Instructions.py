@@ -72,6 +72,13 @@ class Affectation(Instruction):
         data.Block.modify(name.__str__(), expr)
         # TODO test compability
 
+class FunctionDef(Instruction):
+    def __init__(self, data):
+        Node.__init__(self, data)
+        name = Name(data)
+        args = Arguments(data)
+        Instruction.__init__(self, [name, args]) # v = 2 + 4
+
 # UNDEFINED _______________________________
 class Arguments(Instruction):
     pass # TODO
@@ -141,8 +148,24 @@ class Value(Expression):
 
     def __str__(self):
         return self.value_s
-    def __repr__(self):
-        return self.__str__()
+
+class FunctionCall(Expression):
+    def __init__(self, data):
+        Expression.__init__(self, data)
+        self.args = None
+
+    def fill(self):
+        token = self.data.Handler.next_string()
+        self.value_s = token
+        self.args = findArgs()
+
+        block = self.data.Block.getFunction(self.value_s, self.args)
+        if (block == None):
+            self.data.Logger.logError("Error: " + self.__str__() + " function is not known")
+            raise ErrorEnvironment()
+
+    def __str__(self):
+        return self.value_s + self.args.__str__()
 
 # OPERATOR ________________________________
 class Operator(Expression):
@@ -163,17 +186,23 @@ class Operator(Expression):
 class Add(Operator):
     def __init__(self, data):
         Operator.__init__(self, data)
-
     def __str__(self):
         return self.expr1.__str__() + " + " + self.expr2.__str__()
-
-# TODO
 class Sub(Operator):
-    pass
+    def __init__(self, data):
+        Operator.__init__(self, data)
+    def __str__(self):
+        return self.expr1.__str__() + " - " + self.expr2.__str__()
 class Mul(Operator):
-    pass
+    def __init__(self, data):
+        Operator.__init__(self, data)
+    def __str__(self):
+        return self.expr1.__str__() + " * " + self.expr2.__str__()
 class Div(Operator):
-    pass
+    def __init__(self, data):
+        Operator.__init__(self, data)
+    def __str__(self):
+        return self.expr1.__str__() + " / " + self.expr2.__str__()
 
 # FUNCTIONS _______________________________
 def revDict(dict, value):
@@ -192,31 +221,30 @@ def findValue(string, type):
 
 # Return the true expression object (such as Name, Value, Type, ...)
 def findExpr(data):
-    expr = None # expression
-
     if (data.Handler.check("[")): # list
-        expression_list = []
-        operator_list = []
+        left_expr = None
+        right_expr = None
+        operator = None
+        
+        left_expr = findExpr(data)  
+        string = data.Handler.next_string()
+        oper = data.oper_dict[string](data)
+        right_expr = findExpr(data)
 
-        b_operator = False
-        while not (data.Handler.check("]")):
-            string = data.Handler.next_string()
-            if (not b_operator):
-                expr = data.expr_dict[string](data)
-                expression_list.append(expr)
-                expr.fill()
-            else:
-                oper = data.oper_dict[string](data)
-                operator_list.append(oper)
-            b_operator = not b_operator
+        oper.setLeftExpr(left_expr)
+        oper.setRightExpr(right_expr)
+        
+        if (not data.Handler.check("]")):
+            self.data.Logger.logError("Error: unable to find end of expression")
+            raise ErrorParsing()
 
-        expr = factoriseExpr(data, expression_list, operator_list)
+        return oper
     else: # single expression
         string = data.Handler.next_string()
         expr = data.expr_dict[string](data)
         expr.fill()
-    
-    return expr
+
+        return expr
 
 # ADD(4, ADD(4, 4))
 def factoriseExpr(data, expression_list, operator_list):
