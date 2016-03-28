@@ -1,4 +1,4 @@
-from Logger import Logger
+﻿from Logger import Logger
 
 # Program parser
 class Handler:

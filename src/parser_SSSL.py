@@ -14,16 +14,18 @@
 from __future__ import print_function, division, absolute_import, unicode_literals
 
 from grako.parsing import graken, Parser
-from grako.util import re, RE_FLAGS  # noqa
+from grako.util import re, RE_FLAGS, generic_main  # noqa
 
 
-__version__ = (2016, 3, 21, 8, 58, 44, 0)
+__version__ = (2016, 3, 28, 16, 50, 25, 0)
 
 __all__ = [
     'SSSLParser',
     'SSSLSemantics',
     'main'
 ]
+
+KEYWORDS = set([])
 
 
 class SSSLParser(Parser):
@@ -34,6 +36,7 @@ class SSSLParser(Parser):
                  eol_comments_re=None,
                  ignorecase=None,
                  left_recursion=True,
+                 keywords=KEYWORDS,
                  **kwargs):
         super(SSSLParser, self).__init__(
             whitespace=whitespace,
@@ -42,6 +45,7 @@ class SSSLParser(Parser):
             eol_comments_re=eol_comments_re,
             ignorecase=ignorecase,
             left_recursion=left_recursion,
+            keywords=keywords,
             **kwargs
         )
 
@@ -49,120 +53,286 @@ class SSSLParser(Parser):
     def _START_(self):
 
         def block0():
-            self._INSTR_()
+            self._DEFS_()
+            self.add_last_node_to_name('DEFS')
         self._closure(block0)
         self._check_eof()
+
+        self.ast._define(
+            [],
+            ['DEFS']
+        )
+
+    @graken()
+    def _DEFS_(self):
+        with self._choice():
+            with self._option():
+                self._DOBJT_()
+                self.name_last_node('DOBJT')
+            with self._option():
+                self._DMAIN_()
+                self.name_last_node('DFUNC')
+            with self._option():
+                self._DFUNC_()
+                self.name_last_node('DFUNC')
+            self._error('no available options')
+
+        self.ast._define(
+            ['DOBJT', 'DFUNC'],
+            []
+        )
+
+    @graken()
+    def _BLOCK_(self):
+        self._token('{')
+        with self._group():
+            with self._choice():
+                with self._option():
+
+                    def block0():
+                        self._INSTR_()
+                        self.add_last_node_to_name('@')
+                    self._positive_closure(block0)
+                with self._option():
+                    self._NULL_()
+                    self.name_last_node('@')
+                self._error('no available options')
+        self._token('}')
 
     @graken()
     def _INSTR_(self):
         with self._choice():
             with self._option():
-                self._DECL_()
-                self._cut()
+                self._DECLAFF_()
+                self.name_last_node('DECLAFF')
             with self._option():
-                self._AFFECT_()
+                self._DECL_()
+                self.name_last_node('DECL')
+            with self._option():
+                self._AFF_()
+                self.name_last_node('AFF')
+            with self._option():
+                self._CFUNC_()
+                self.name_last_node('CFUNC')
             self._error('no available options')
+
+        self.ast._define(
+            ['DECLAFF', 'DECL', 'AFF', 'CFUNC'],
+            []
+        )
 
     @graken()
     def _DECL_(self):
-        pass
-        self.ast['DECL'] = self.last_node
-        self._type_()
-        self.ast['TYPE'] = self.last_node
+        self._TYPE_()
+        self.name_last_node('TYPE')
         self._nom_()
-        self.ast['NAME'] = self.last_node
-        self._token('=')
-        self._expr_()
-        self.ast['EXPR'] = self.last_node
+        self.name_last_node('NAME')
 
         self.ast._define(
-            ['DECL', 'TYPE', 'NAME', 'EXPR'],
+            ['TYPE', 'NAME'],
             []
         )
 
     @graken()
-    def _AFFECT_(self):
-        pass
-        self.ast['AFFECT'] = self.last_node
+    def _DECLAFF_(self):
+        self._TYPE_()
+        self.name_last_node('TYPE')
         self._nom_()
-        self.ast['NAME'] = self.last_node
+        self.name_last_node('NAME')
         self._token('=')
-        self._expr_()
-        self.ast['EXPR'] = self.last_node
+        self._EXPR_()
+        self.name_last_node('EXPR')
 
         self.ast._define(
-            ['AFFECT', 'NAME', 'EXPR'],
+            ['TYPE', 'NAME', 'EXPR'],
             []
         )
 
     @graken()
-    def _expr_(self):
+    def _AFF_(self):
+        self._nom_()
+        self.name_last_node('NAME')
+        self._token('=')
+        self._EXPR_()
+        self.name_last_node('EXPR')
+
+        self.ast._define(
+            ['NAME', 'EXPR'],
+            []
+        )
+
+    @graken()
+    def _CFUNC_(self):
+        self._nom_()
+        self.name_last_node('NAME')
+        self._ARGS_()
+        self.name_last_node('ARGS')
+
+        self.ast._define(
+            ['NAME', 'ARGS'],
+            []
+        )
+
+    @graken()
+    def _PARAM_(self):
         with self._choice():
             with self._option():
-                self._t_expr_()
-                self._OPER_()
-                self._expr_()
+                self._token('(')
+                self._EMPTY_()
+                self.name_last_node('@')
+                self._token(')')
             with self._option():
-                self._t_expr_()
+                self._token('(')
+                with self._optional():
+                    self.__TYPE_()
+                    self.name_last_node('@')
+                    self.__nom_()
+                    self.name_last_node('@')
+
+                    def block3():
+                        self._token(',')
+                        self.__TYPE_()
+                        self.name_last_node('@')
+                        self.__nom_()
+                        self.name_last_node('@')
+                    self._closure(block3)
+                self._token(')')
+            self._error('expecting one of: (')
+
+    @graken()
+    def _ARGS_(self):
+        with self._choice():
+            with self._option():
+                self._token('(')
+                self._EMPTY_()
+                self.name_last_node('@')
+                self._token(')')
+            with self._option():
+                self._token('(')
+                with self._optional():
+                    self.__EXPR_()
+                    self.add_last_node_to_name('@')
+
+                    def block2():
+                        self._token(',')
+                        self.__EXPR_()
+                        self.add_last_node_to_name('@')
+                    self._closure(block2)
+                self._token(')')
+            self._error('expecting one of: (')
+
+    @graken()
+    def _EMPTY_(self):
+        self._empty_closure()
+
+    @graken()
+    def _DOBJT_(self):
+        self._token('class')
+        self._nom_()
+        self.name_last_node('Name')
+        self._token('{')
+
+        def block1():
+            self._DMEMB_()
+            self.name_last_node('@')
+        self._closure(block1)
+        self._token('}')
+
+        self.ast._define(
+            ['Name'],
+            []
+        )
+
+    @graken()
+    def _DMEMB_(self):
+        with self._choice():
+            with self._option():
+                self.__DFUNC_()
+                self.name_last_node('@')
+            with self._option():
+                self.__DECLAFF_()
+                self.name_last_node('@')
+            with self._option():
+                self.__DECL_()
+                self.name_last_node('@')
+            with self._option():
+                self.__CSTR_()
+                self.name_last_node('@')
             self._error('no available options')
+
+    @graken()
+    def _DFUNC_(self):
+        self._token('func')
+        self._nom_()
+        self.name_last_node('NAME')
+        self._PARAM_()
+        self.name_last_node('PARAM')
+        self._BLOCK_()
+        self.name_last_node('BLOCK')
+
+        self.ast._define(
+            ['NAME', 'PARAM', 'BLOCK'],
+            []
+        )
+
+    @graken()
+    def _DMAIN_(self):
+        self._token('Main')
+        self.name_last_node('NAME')
+        self._PARAM_()
+        self.name_last_node('PARAM')
+        self._BLOCK_()
+        self.name_last_node('BLOCK')
+
+        self.ast._define(
+            ['NAME', 'PARAM', 'BLOCK'],
+            []
+        )
+
+    @graken()
+    def _CSTR_(self):
+        self._nom_()
+        self.name_last_node('NAME')
+        self._PARAM_()
+        self.name_last_node('PARAM')
+        self._BLOCK_()
+        self.name_last_node('BLOCK')
+
+        self.ast._define(
+            ['NAME', 'PARAM', 'BLOCK'],
+            []
+        )
+
+    @graken()
+    def _TYPE_(self):
+        with self._choice():
+            with self._option():
+                self._token('int')
+            with self._option():
+                self._token('float')
+            with self._option():
+                self._token('string')
+            with self._option():
+                self._token('void')
+            self._error('expecting one of: float int string void')
 
     @graken()
     def _OPER_(self):
         with self._choice():
             with self._option():
                 self._token('+')
-                self._cut()
             with self._option():
                 self._token('-')
-                self._cut()
             with self._option():
                 self._token('*')
-                self._cut()
             with self._option():
-                self._token('/')
-            self._error('expecting one of: * + - /')
+                self._token('*')
+            self._error('expecting one of: * + -')
 
     @graken()
-    def _t_expr_(self):
-        with self._choice():
-            with self._option():
-                self._object_()
-                self._cut()
-            with self._option():
-                self._f_nom_()
-                self._cut()
-            with self._option():
-                self._f_val_()
-            self._error('no available options')
-
-    @graken()
-    def _object_(self):
-        self._nom_()
-        self.ast['CLASS_N'] = self.last_node
-        self._token('(')
-        self._args_()
-        self.ast['ARGS'] = self.last_node
-        self._token(')')
-
-        self.ast._define(
-            ['CLASS_N', 'ARGS'],
-            []
-        )
-
-    @graken()
-    def _args_(self):
-        with self._choice():
-            with self._option():
-                self._expr_()
-                self.ast['EXPR'] = self.last_node
-                self._token(',')
-                self._expr_()
-                self.ast['EXPR'] = self.last_node
-                self._cut()
-            with self._option():
-                self._expr_()
-                self.ast['EXPR'] = self.last_node
-            self._error('no available options')
+    def __EXPR_(self):
+        self._EXPR_()
+        self.name_last_node('EXPR')
 
         self.ast._define(
             ['EXPR'],
@@ -170,28 +340,90 @@ class SSSLParser(Parser):
         )
 
     @graken()
-    def _type_(self):
-        with self._group():
-            with self._choice():
-                with self._option():
-                    self._token('int')
-                    self._cut()
-                with self._option():
-                    self._token('float')
-                self._error('expecting one of: float int')
+    def _EXPR_(self):
+        with self._choice():
+            with self._option():
+                self._t_EXPR_()
+                self.name_last_node('@')
+                self._OPER_()
+                self.name_last_node('@')
+                self._EXPR_()
+                self.name_last_node('@')
+            with self._option():
+                self._t_EXPR_()
+                self.name_last_node('@')
+            self._error('no available options')
+
+    @graken()
+    def _t_EXPR_(self):
+        with self._choice():
+            with self._option():
+                self._CFUNC_()
+                self.name_last_node('CFUNC')
+            with self._option():
+                self._nom_()
+                self.name_last_node('NAME')
+            with self._option():
+                self._val_()
+                self.name_last_node('VAL')
+            self._error('no available options')
+
+        self.ast._define(
+            ['CFUNC', 'NAME', 'VAL'],
+            []
+        )
 
     @graken()
     def _nom_(self):
-        self._pattern(r'[a-z]+')
+        self._pattern(r'[a-zA-Z_]+')
+
+    @graken()
+    def _tout_(self):
+        self._pattern(r'[0-9a-zA-Z_]+')
 
     @graken()
     def _val_(self):
         self._pattern(r'[0-9]+')
 
     @graken()
-    def _f_type_(self):
-        self._type_()
-        self.ast['TYPE'] = self.last_node
+    def _NULL_(self):
+        pass
+        self.name_last_node('@')
+
+    @graken()
+    def __DFUNC_(self):
+        self._DFUNC_()
+        self.name_last_node('DFUNC')
+
+        self.ast._define(
+            ['DFUNC'],
+            []
+        )
+
+    @graken()
+    def __DECLAFF_(self):
+        self._DECLAFF_()
+        self.name_last_node('DECLAFF')
+
+        self.ast._define(
+            ['DECLAFF'],
+            []
+        )
+
+    @graken()
+    def __DECL_(self):
+        self._DECL_()
+        self.name_last_node('DECL')
+
+        self.ast._define(
+            ['DECL'],
+            []
+        )
+
+    @graken()
+    def __TYPE_(self):
+        self._TYPE_()
+        self.name_last_node('TYPE')
 
         self.ast._define(
             ['TYPE'],
@@ -199,9 +431,9 @@ class SSSLParser(Parser):
         )
 
     @graken()
-    def _f_nom_(self):
+    def __nom_(self):
         self._nom_()
-        self.ast['NAME'] = self.last_node
+        self.name_last_node('NAME')
 
         self.ast._define(
             ['NAME'],
@@ -209,12 +441,12 @@ class SSSLParser(Parser):
         )
 
     @graken()
-    def _f_val_(self):
-        self._val_()
-        self.ast['VAL'] = self.last_node
+    def __CSTR_(self):
+        self._CSTR_()
+        self.name_last_node('CSTR')
 
         self.ast._define(
-            ['VAL'],
+            ['CSTR'],
             []
         )
 
@@ -223,51 +455,109 @@ class SSSLSemantics(object):
     def START(self, ast):
         return ast
 
+    def DEFS(self, ast):
+        return ast
+
+    def BLOCK(self, ast):
+        return ast
+
     def INSTR(self, ast):
         return ast
 
     def DECL(self, ast):
         return ast
 
-    def AFFECT(self, ast):
+    def DECLAFF(self, ast):
         return ast
 
-    def expr(self, ast):
+    def AFF(self, ast):
+        return ast
+
+    def CFUNC(self, ast):
+        return ast
+
+    def PARAM(self, ast):
+        return ast
+
+    def ARGS(self, ast):
+        return ast
+
+    def EMPTY(self, ast):
+        return ast
+
+    def DOBJT(self, ast):
+        return ast
+
+    def DMEMB(self, ast):
+        return ast
+
+    def DFUNC(self, ast):
+        return ast
+
+    def DMAIN(self, ast):
+        return ast
+
+    def CSTR(self, ast):
+        return ast
+
+    def TYPE(self, ast):
         return ast
 
     def OPER(self, ast):
         return ast
 
-    def t_expr(self, ast):
+    def _EXPR(self, ast):
         return ast
 
-    def object(self, ast):
+    def EXPR(self, ast):
         return ast
 
-    def args(self, ast):
-        return ast
-
-    def type(self, ast):
+    def t_EXPR(self, ast):
         return ast
 
     def nom(self, ast):
         return ast
 
+    def tout(self, ast):
+        return ast
+
     def val(self, ast):
         return ast
 
-    def f_type(self, ast):
+    def NULL(self, ast):
         return ast
 
-    def f_nom(self, ast):
+    def _DFUNC(self, ast):
         return ast
 
-    def f_val(self, ast):
+    def _DECLAFF(self, ast):
+        return ast
+
+    def _DECL(self, ast):
+        return ast
+
+    def _TYPE(self, ast):
+        return ast
+
+    def _nom(self, ast):
+        return ast
+
+    def _CSTR(self, ast):
         return ast
 
 
-def main(filename, startrule, trace=False, whitespace=None, nameguard=None):
-    import json
+def main(
+        filename,
+        startrule,
+        trace=False,
+        whitespace=None,
+        nameguard=None,
+        comments_re=None,
+        eol_comments_re=None,
+        ignorecase=None,
+        left_recursion=True,
+        **kwargs):
+
     with open(filename) as f:
         text = f.read()
     parser = SSSLParser(parseinfo=False)
@@ -277,46 +567,17 @@ def main(filename, startrule, trace=False, whitespace=None, nameguard=None):
         filename=filename,
         trace=trace,
         whitespace=whitespace,
-        nameguard=nameguard)
+        nameguard=nameguard,
+        ignorecase=ignorecase,
+        **kwargs)
+    return ast
+
+if __name__ == '__main__':
+    import json
+    ast = generic_main(main, SSSLParser, name='SSSL')
     print('AST:')
     print(ast)
     print()
     print('JSON:')
     print(json.dumps(ast, indent=2))
     print()
-
-if __name__ == '__main__':
-    import argparse
-    import string
-    import sys
-
-    class ListRules(argparse.Action):
-        def __call__(self, parser, namespace, values, option_string):
-            print('Rules:')
-            for r in SSSLParser.rule_list():
-                print(r)
-            print()
-            sys.exit(0)
-
-    parser = argparse.ArgumentParser(description="Simple parser for SSSL.")
-    parser.add_argument('-l', '--list', action=ListRules, nargs=0,
-                        help="list all rules and exit")
-    parser.add_argument('-n', '--no-nameguard', action='store_true',
-                        dest='no_nameguard',
-                        help="disable the 'nameguard' feature")
-    parser.add_argument('-t', '--trace', action='store_true',
-                        help="output trace information")
-    parser.add_argument('-w', '--whitespace', type=str, default=string.whitespace,
-                        help="whitespace specification")
-    parser.add_argument('file', metavar="FILE", help="the input file to parse")
-    parser.add_argument('startrule', metavar="STARTRULE",
-                        help="the start rule for parsing")
-    args = parser.parse_args()
-
-    main(
-        args.file,
-        args.startrule,
-        trace=args.trace,
-        whitespace=args.whitespace,
-        nameguard=not args.no_nameguard
-    )

@@ -1,32 +1,84 @@
+(* __Main__ *)
 
-START = { INSTR } $ ;
+START = {DEFS+:DEFS}* $ ;
+ 
+DEFS = DOBJT:DOBJT | DFUNC:DMAIN | DFUNC:DFUNC;
 
-INSTR = DECL~ | AFFECT ;
+(* __Instructions__ *)
 
-DECL = DECL:() TYPE:type NAME:nom '=' EXPR:expr ;						(* Instruction *)
+BLOCK = '{' ({@+:INSTR}+ | @:NULL) '}' ;
 
-AFFECT = AFFECT:() NAME:nom '=' EXPR:expr ;								(* Instruction *)
+INSTR = DECLAFF:DECLAFF | DECL:DECL | AFF:AFF | CFUNC:CFUNC ; 
 
-expr = t_expr OPER expr | t_expr ;
+DECL = TYPE:TYPE NAME:nom ;
 
-OPER = '+'~ | '-'~ | '*'~ | '/' ;
+DECLAFF = TYPE:TYPE NAME:nom '=' EXPR:EXPR ;
 
-t_expr = object~ | f_nom~ | f_val ;	 	
+AFF = NAME:nom '=' EXPR:EXPR ;
 
-object = CLASS_N:nom '(' ARGS:args ')' ;
+CFUNC = NAME:nom ARGS:ARGS ;
 
-args = EXPR:expr ',' EXPR:expr~ | EXPR:expr ;							(* | FUNC *)
 
-(* ___ *)
 
-type = ('int'~ | 'float') ;
+(* __Paramètres Arguments__ *)
 
-nom = /[a-z]+/ ;
+PARAM = '(' @:EMPTY ')' | '(' [@:_TYPE @:_nom {',' @:_TYPE @:_nom}*] ')' ;
+
+ARGS = '(' @:EMPTY ')' | '(' [@+:_EXPR {',' @+:_EXPR}*] ')' ;
+
+EMPTY = {} ;
+
+(* __Objets Fonctions__ *)
+
+DOBJT = 'class' Name:nom '{' { @:DMEMB }* '}' ;
+
+DMEMB = @:_DFUNC | @:_DECLAFF | @:_DECL | @:_CSTR;
+
+DFUNC = 'func' NAME:nom PARAM:PARAM BLOCK:BLOCK ;
+
+DMAIN = NAME:'Main' PARAM:PARAM BLOCK:BLOCK ;
+
+CSTR = NAME:nom PARAM:PARAM BLOCK:BLOCK ;
+
+
+
+(* __Types Opérateurs__ *)
+
+TYPE = 'int' | 'float' | 'string' | 'void' ;
+
+OPER = '+' | '-' | '*' | '*' ;
+
+
+
+(* __Expressions__ *)
+
+_EXPR = EXPR:EXPR ;
+
+EXPR = @:t_EXPR @:OPER @:EXPR | @:t_EXPR ;
+
+t_EXPR = CFUNC:CFUNC | NAME:nom | VAL:val ;
+
+nom = /[a-zA-Z_]+/ ;
+
+tout =/[0-9a-zA-Z_]+/ ;
 
 val = /[0-9]+/ ;
 
-f_type = TYPE:type ;
 
-f_nom = NAME:nom ;
 
-f_val = VAL:val ;
+(* __Autres__ *)
+
+NULL = @:() ;
+
+_DFUNC = DFUNC:DFUNC ;
+
+_DECLAFF = DECLAFF:DECLAFF ;
+
+_DECL = DECL:DECL ;
+
+_TYPE = TYPE:TYPE ;
+
+_nom = NAME:nom ;
+
+_CSTR = CSTR:CSTR ;
+

@@ -1,0 +1,36 @@
+
+START = { INSTR } $ ;
+
+INSTR = DECL:DECL~ | AFFECT:AFFECT~ | LOL:FDEF ;
+
+FDEF = FDEF:() 'func' NAME:nom '(' FARGS:fargs ')' ('{' { INSTR:INSTR } '}' | INSTR:INSTR) ;
+
+DECL = DECL:() TYPE:type NAME:nom '=' EXPR:expr ;						(* Instruction *)
+
+AFFECT = AFFECT:() NAME:nom '=' EXPR:expr ;								(* Instruction *)
+
+expr = t_expr OPER expr | t_expr ;
+
+OPER = '+'~ | '-'~ | '*'~ | '/' ;
+
+t_expr = object~ | f_nom~ | f_val ;	 	
+
+object = CLASS_N:nom '(' ARGS:args ')' ;
+
+fargs = f_nom ',' fargs~ | f_nom ;
+
+args = EXPR:expr ',' args~ | EXPR:expr ;							(* | FUNC *)
+
+(* ___ *)
+
+type = ('int'~ | 'float') ;
+
+nom = /[a-z]+/ ;
+
+val = /[0-9]+/ ;
+
+f_type = TYPE:type ;
+
+f_nom = NAME:nom ;
+
+f_val = VAL:val ;

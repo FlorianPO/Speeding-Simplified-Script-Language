@@ -1,4 +1,4 @@
-class NoInstructionLeft(Exception):
+﻿class NoInstructionLeft(Exception):
     pass
 
 class ErrorParsing(Exception):

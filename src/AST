@@ -1,62 +1,79 @@
-[
-  {
-    "DECL": null,
-    "TYPE": "int",
-    "NAME": "a",
-    "EXPR": [
-      {
-        "VAL": "4"
-      },
-      "+",
-      {
-        "VAL": "4"
-      }
-    ]
-  },
-  {
-    "DECL": null,
-    "TYPE": "int",
-    "NAME": "b",
-    "EXPR": {
-      "NAME": "a"
-    }
-  },
-  {
-    "AFFECT": null,
-    "NAME": "a",
-    "EXPR": [
-      {
-        "VAL": "7"
-      },
-      "+",
-      {
-        "VAL": "8"
-      }
-    ]
-  },
-  {
-    "AFFECT": null,
-    "NAME": "b",
-    "EXPR": [
-      {
-        "NAME": "a"
-      },
-      "*",
-      [
-        {
-          "VAL": "7"
-        },
-        "+",
-        [
-          {
-            "VAL": "4"
-          },
-          "+",
-          {
-            "VAL": "5"
-          }
+
+  "DEFS": [
+      "DFUNC":  
+        "NAME": "MaFonction" 
+        "PARAM": [
+            "TYPE": "int"
+            "NAME": "a"
+            "TYPE": "int"
+            "NAME": "b"
+            "TYPE": "int"
+            "NAME": "c"
+        ] 
+        "BLOCK": [
+            "AFF":  
+              "NAME": "a" 
+              "EXPR": [
+                  "NAME": "b" 
+                "+" 
+                [
+                    "NAME": "c" 
+                  "+" 
+                  [
+                      "NAME": "a" 
+                    "+" 
+                      "VAL": "4" 
+                  ]
+                ]
+              ]
         ]
-      ]
-    ]
-  }
-]
+      "DFUNC":  
+        "NAME": "Main" 
+        "PARAM": [] 
+        "BLOCK": [
+            "DECL":  
+              "TYPE": "int" 
+              "NAME": "b"
+            "DECLAFF":  
+              "TYPE": "int" 
+              "NAME": "ca" 
+              "EXPR": [
+                  "CFUNC":  
+                    "NAME": "MaFonction" 
+                    "ARGS": [
+                        "EXPR":  
+                          "VAL": "4" 
+                        "EXPR":  
+                          "CFUNC":  
+                            "NAME": "MaFonction" 
+                            "ARGS": [
+                                "EXPR":  
+                                  "NAME": "b" 
+                                "EXPR":  
+                                  "VAL": "2" 
+                                "EXPR":  
+                                  "VAL": "3" 
+                            ]
+                        "EXPR":  
+                          "VAL": "4" 
+                    ]
+                "+" 
+                  "VAL": "5" 
+              ]
+            "DECLAFF":  
+              "TYPE": "float" 
+              "NAME": "c" 
+              "EXPR":  
+                "VAL": "42" 
+            "DECLAFF":  
+              "TYPE": "float" 
+              "NAME": "a" 
+              "EXPR":  
+                "VAL": "16" 
+            "AFF":  
+              "NAME": "a" 
+              "EXPR":  
+                "VAL": "4" 
+        ]
+  ]
+
