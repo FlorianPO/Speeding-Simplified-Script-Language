@@ -13,15 +13,16 @@ class FunctionDef(Instruction):
     def __init__(self, data):
         Node.__init__(self, data)
 
+        type = Type(data)
         name = Name(data, False)
         parm = Parameters(data)
         block = Block(data.Block, data)
         
         data.Block = block # parm need to be in block environment
-        Instruction.__init__(self, [name, parm, block])
+        Instruction.__init__(self, [type, name, parm, block])
         data.Block = block.parent # retrieve old block
         
-        data.Block.addFunction(name.__str__(), parm.__key__(), block) # add function to environment
+        data.Block.addFunction(name.__str__(), parm.__key__(), type) # add function to environment
 
 # [Name] [Arguments]: function(4+5, c)
 class FunctionCall(Instruction, Expression): # this node is kind of special since it's both an Instruction and an Expression
@@ -37,9 +38,8 @@ class FunctionCall(Instruction, Expression): # this node is kind of special sinc
             self.data.Logger.logError("Error: " + name.__str__() + args.__key__() +  " function is not known")
             raise ErrorEnvironment()
 
-    def getType(self): # return type of function
-        # TODO
-        return Type(self.data, "int")
+    def getType(self): # returns type of function
+        return self.data.Block.getFunction(self.tokens[0].__str__(), self.tokens[1].__key__())
 
 # {[Expr]}*: (4+2, b)
 class Arguments(Node):

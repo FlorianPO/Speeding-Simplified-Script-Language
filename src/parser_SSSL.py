@@ -17,7 +17,7 @@ from grako.parsing import graken, Parser
 from grako.util import re, RE_FLAGS, generic_main  # noqa
 
 
-__version__ = (2016, 3, 28, 21, 21, 1, 0)
+__version__ = (2016, 3, 29, 11, 38, 47, 1)
 
 __all__ = [
     'SSSLParser',
@@ -263,6 +263,8 @@ class SSSLParser(Parser):
     @graken()
     def _DFUNC_(self):
         self._token('func')
+        self._TYPE_()
+        self.name_last_node('TYPE')
         self._nom_()
         self.name_last_node('NAME')
         self._PARAM_()
@@ -271,12 +273,14 @@ class SSSLParser(Parser):
         self.name_last_node('BLOCK')
 
         self.ast._define(
-            ['NAME', 'PARAM', 'BLOCK'],
+            ['TYPE', 'NAME', 'PARAM', 'BLOCK'],
             []
         )
 
     @graken()
     def _DMAIN_(self):
+        self._TYPE_()
+        self.name_last_node('TYPE')
         self._token('Main')
         self.name_last_node('NAME')
         self._PARAM_()
@@ -285,7 +289,7 @@ class SSSLParser(Parser):
         self.name_last_node('BLOCK')
 
         self.ast._define(
-            ['NAME', 'PARAM', 'BLOCK'],
+            ['TYPE', 'NAME', 'PARAM', 'BLOCK'],
             []
         )
 

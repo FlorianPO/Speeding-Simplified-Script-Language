@@ -1,6 +1,7 @@
 
   "DEFS": [
       "DFUNC":  
+        "TYPE": "int" 
         "NAME": "MaFonction" 
         "PARAM": [
             "TYPE": "int"
@@ -28,6 +29,7 @@
               ]
         ]
       "DFUNC":  
+        "TYPE": "void" 
         "NAME": "Main" 
         "PARAM": [] 
         "BLOCK": [

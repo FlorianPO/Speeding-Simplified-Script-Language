@@ -1,10 +1,10 @@
-func MaFonction(int a, int b, int c)
+func int MaFonction(int a, int b, int c)
 {
 	a=b+c+a+4
 }
 
 
-Main()
+void Main()
 {
     int b
 	int ca = MaFonction(4, MaFonction(b, 2, 3), 4) + 5

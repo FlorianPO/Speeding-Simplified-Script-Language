@@ -4,6 +4,8 @@ START = {DEFS+:DEFS}* $ ;
  
 DEFS = DOBJT:DOBJT | DFUNC:DMAIN | DFUNC:DFUNC;
 
+
+
 (* __Instructions__ *)
 
 BLOCK = '{' ({@+:INSTR}+ | @:NULL) '}' ;
@@ -28,15 +30,17 @@ ARGS = '(' @:EMPTY ')' | '(' [@+:_EXPR {',' @+:_EXPR}*] ')' ;
 
 EMPTY = {} ;
 
+
+
 (* __Objets Fonctions__ *)
 
 DOBJT = 'class' Name:nom '{' { @:DMEMB }* '}' ;
 
 DMEMB = @:_DFUNC | @:_DECLAFF | @:_DECL | @:_CSTR;
 
-DFUNC = 'func' NAME:nom PARAM:PARAM BLOCK:BLOCK ;
+DFUNC = 'func' TYPE:TYPE NAME:nom PARAM:PARAM BLOCK:BLOCK ;
 
-DMAIN = NAME:'Main' PARAM:PARAM BLOCK:BLOCK ;
+DMAIN = TYPE:TYPE NAME:'Main' PARAM:PARAM BLOCK:BLOCK ;
 
 CSTR = NAME:nom PARAM:PARAM BLOCK:BLOCK ;
 

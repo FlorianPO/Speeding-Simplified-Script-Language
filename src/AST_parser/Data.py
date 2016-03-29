@@ -14,7 +14,7 @@ class Data:
     def __init__(self):
         # LISTS ___________________________________
         self.instr_dict = {"DECL": Declaration, "AFF": Affectation, "DECLAFF": Declaffectation, "DFUNC": FunctionDef, "CFUNC": FunctionCall} # TODO complete
-        self.type_list = ["int", "float"] # TODO complete
+        self.type_list = ["int", "float", "string", "void"] # TODO complete
         self.expr_dict = {"EXPR": Expression, "TYPE": Type, "NAME": Name, "VAL": Value} # TODO complete
         self.oper_dict = {"+": Add, "-": Sub, "*": Mul, "/": Div} # TODO complete
         self.other_dict = {"PARAM": Parameters, "ARGS": Arguments, "BLOCK": Block}

@@ -48,7 +48,7 @@ def functioncall():
 
 def functiondef():
     def __go__(self):
-        return self.tokens[0].__go__() + self.tokens[1].__go__() + self.tokens[2].__go__()
+        return self.tokens[0].__go__() + " " + self.tokens[1].__go__() + self.tokens[2].__go__() + self.tokens[3].__go__()
     FunctionDef.__go__ = __go__
 
 def arguments():
