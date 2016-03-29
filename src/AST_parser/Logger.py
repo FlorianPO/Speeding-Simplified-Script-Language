@@ -1,4 +1,7 @@
-﻿class Logger:
+﻿# -*- coding: utf-8 -*-
+
+# Parsing logger
+class Logger:
     def __init__(self, name, trace=True):
         self.trace = trace
         self.name = name

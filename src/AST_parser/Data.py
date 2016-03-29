@@ -1,4 +1,6 @@
-﻿from Logger import Logger
+﻿# -*- coding: utf-8 -*-
+
+from Logger import Logger
 from Handler import Handler
 
 from Nodes.Instruction import *
@@ -7,6 +9,7 @@ from Nodes.Function import *
 from Nodes.Operator import *
 from Nodes.Block import *
 
+# Parsing data
 class Data:
     def __init__(self):
         # LISTS ___________________________________
@@ -24,5 +27,4 @@ class Data:
         self.Logger = Logger("Default logger")
         self.Handler = Handler("Default handler", self.Logger)
         self.GlobalBlock = Block(None, self)
-        self.MainBlock = Block(self.GlobalBlock, self)
-        self.Block = None # current block
+        self.Block = None # current parsing block

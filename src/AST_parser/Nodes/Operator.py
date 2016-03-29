@@ -1,7 +1,10 @@
-﻿from Nodes.Node import *
+﻿# -*- coding: utf-8 -*-
+
+from Nodes.Node import *
 from Nodes.Expression import *
 
-# OPERATOR ________________________________
+# Abstract class of an operator
+# An operator has a left expression and a right expression
 class Operator(Expression):
     def __init__(self, data):
         Node.__init__(self, data)
@@ -13,29 +16,31 @@ class Operator(Expression):
     def setRightExpr(self, expr):
         self.expr2 = expr
 
+    # Resolve the final type of (expr1 OPERATOR expr2)
     def resolveType(self):
         # TODO
         pass
 
     def getType(self):
+        # TODO
        return Type(self.data, "int")
 
-class Add(Operator):
+class Add(Operator): # Addition
     def __init__(self, data):
         Operator.__init__(self, data)
     def __str__(self):
         return self.expr1.__str__() + " + " + self.expr2.__str__()
-class Sub(Operator):
+class Sub(Operator): # Substraction
     def __init__(self, data):
         Operator.__init__(self, data)
     def __str__(self):
         return self.expr1.__str__() + " - " + self.expr2.__str__()
-class Mul(Operator):
+class Mul(Operator): # Multiplication
     def __init__(self, data):
         Operator.__init__(self, data)
     def __str__(self):
         return self.expr1.__str__() + " * " + self.expr2.__str__()
-class Div(Operator):
+class Div(Operator): # Division
     def __init__(self, data):
         Operator.__init__(self, data)
     def __str__(self):

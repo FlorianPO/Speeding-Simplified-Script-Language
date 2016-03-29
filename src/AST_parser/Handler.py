@@ -1,9 +1,11 @@
-﻿from Logger import Logger
+﻿# -*- coding: utf-8 -*-
+
+from Logger import Logger
 
 # Program parser
 class Handler:
-    # Return True if the character is useless
     ignore_list = [' ', ',', ':', '{', '}', '\n', '\t']
+    # Return True if the character is useless
     def ignore(c):
         return (c in Handler.ignore_list) 
 

@@ -1,4 +1,6 @@
-﻿from Nodes.Instruction import *
+﻿# -*- coding: utf-8 -*-
+
+from Nodes.Instruction import *
 from Nodes.Expression import *
 from Nodes.Function import *
 from Nodes.Operator import *

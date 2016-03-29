@@ -2,7 +2,8 @@
 
 from Nodes.Node import *
 
-# Expression ________________________________
+# Abstract class of an expression
+# You can create an expression that will specialize itself into a child-class object
 class Expression(Node):
     def __init__(self, data):
         Node.__init__(self, data)
@@ -16,14 +17,15 @@ class Expression(Node):
     def getType(self):
         raise NotImplementedError("getType interface method, problem...")
 
+# Defines a variable or function name
 class Name(Expression):
     def __init__(self, data, check = True):
         Expression.__init__(self, data)
-        self.check = check
+        self._check = check # check in environment or not
 
-    def fill(self):  
+    def fill(self):
         self.value_s = self.data.Handler.next_string()
-        if (self.check):
+        if (self._check): # check environment
             if (self.data.Block.get(self.value_s) == None):
                 self.data.Logger.logError("Error: " + self.value_s + " is not known")
                 raise ErrorEnvironment()
@@ -34,6 +36,7 @@ class Name(Expression):
     def __str__(self):
         return self.value_s
 
+# Defines a immediate value
 class Value(Expression):
     def __init__(self, data):
         Expression.__init__(self, data)
@@ -46,6 +49,7 @@ class Value(Expression):
     def __str__(self):
         return self.value_s
 
+# Defines a type
 class Type(Node):
     def __init__(self, data, keyword = None):
         Node.__init__(self, data)

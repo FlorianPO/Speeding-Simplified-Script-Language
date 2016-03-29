@@ -17,7 +17,7 @@ from grako.parsing import graken, Parser
 from grako.util import re, RE_FLAGS, generic_main  # noqa
 
 
-__version__ = (2016, 3, 28, 16, 50, 25, 0)
+__version__ = (2016, 3, 28, 21, 21, 1, 0)
 
 __all__ = [
     'SSSLParser',
