@@ -7,41 +7,93 @@ from Nodes.Block import *
 from Nodes.Expression import *
 
 # [Type] [Name]: int variable
-class Declaration(Instruction):
+class Declaration(Node):
     def __init__(self, data):
         Node.__init__(self, data)
 
-        type = Type(data)
-        name = Name(data, False)
-        Instruction.__init__(self, [type, name])
-        
-        data.Block.add(name.__str__(), type) # add variable to environment
+        self.type = Type(data)
+        self.name = Name(data, False)
+
+        self.type.fill()
+        self.name.fill()
+
+        data.Block.add(self.name.__str__(), self.type) # add variable to environment
+
+    def __str__(self):
+        return self.type.__str__() + " " + self.name.__str__() + ";"
 
 # [Type] [Name] [Expr]: int variable = 8
-class Declaffectation(Instruction):
+class Declaffectation(Node):
     def __init__(self, data):
         Node.__init__(self, data)
 
-        type = Type(data)
-        name = Name(data, False)
-        expr = Expression(data)
-        Instruction.__init__(self, [type, name, expr]) # int v = 2 + 4
+        self.type = Type(data)
+        self.name = Name(data, False)
+        self.expr = Expression(data)
         
-        data.Block.add(name.__str__(), type) # add variable to environment
-        # TODO test compability of type and expr
+        self.type.fill()
+        self.name.fill()
+        self.expr.fill()
+        
+        if (self.type.__str__() != self.expr.getType().__str__()): # test type compability
+            data.Logger.logError("Error: " + self.type.__str__() + " and " + self.expr.getType().__str__() + " are not compatible")
+            raise ErrorType()
+
+        data.Block.add(self.name.__str__(), self.type) # add variable to environment
+
+    def __str__(self):
+        return self.type.__str__() + " " + self.name.__str__() + ":=" + self.expr.__str__() + ";"
 
 # [Name] [Expr]: variable = 7
-class Affectation(Instruction):
+class Affectation(Node):
     def __init__(self, data):
         Node.__init__(self, data)
 
-        name = Name(data, False)
-        expr = Expression(data)
-        Instruction.__init__(self, [name, expr])
+        self.name = Name(data, False)
+        self.expr = Expression(data)
+        
+        self.name.fill()
+        self.expr.fill()
 
-        if (self.data.Block.get(name.__str__()) == None): # test if variable exists in environment
-            self.data.Logger.logError("Error: " + name.__str__() + " is not known")
+        if (data.Block.get(self.name.__str__()) == None): # test if variable exists in environment
+            data.Logger.logError("Error: " + self.name.__str__() + " is not known")
             raise ErrorEnvironment()
 
-        data.Block.modify(name.__str__(), expr) # modify variable in environment
-        # TODO test compability of variable type and expr
+        if (data.Block.get(self.name.__str__()).__str__() != self.expr.getType().__str__()): # test type compability
+            data.Logger.logError("Error: " + data.Block.get(self.name.__str__()).__str__() + " and " + self.expr.getType().__str__() + " are not compatible")
+            raise ErrorType()
+
+        data.Block.modify(self.name.__str__(), self.expr.getType()) # modify variable in environment
+
+    def __str__(self):
+        return self.name.__str__() + "=" + self.expr.__str__() + ";"
+
+class Return(Node):
+    def __init__(self, data):
+        Node.__init__(self, data)
+
+        self.expr = None
+
+        if (data.Handler.check("[")):
+            data.Handler.check("]")
+        else:
+            self.expr = Expression(data)
+            self.expr.fill()
+
+    def __str__(self):
+        if (self.expr == None):
+            return "return;"
+        else:
+            return "return " + self.expr.__str__() + ";"
+
+class Break(Node):
+    def __init__(self, data):
+        Node.__init__(self, data)
+
+        self.expr = ""
+
+        data.Handler.check("[")
+        data.Handler.check("]")
+
+    def __str__(self):
+        return "break;"

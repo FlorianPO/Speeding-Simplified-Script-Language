@@ -17,7 +17,7 @@ from grako.parsing import graken, Parser
 from grako.util import re, RE_FLAGS, generic_main  # noqa
 
 
-__version__ = (2016, 3, 29, 11, 38, 47, 1)
+__version__ = (2016, 4, 3, 22, 41, 24, 6)
 
 __all__ = [
     'SSSLParser',
@@ -54,13 +54,13 @@ class SSSLParser(Parser):
 
         def block0():
             self._DEFS_()
-            self.add_last_node_to_name('DEFS')
+            self.add_last_node_to_name('BLOCK')
         self._closure(block0)
         self._check_eof()
 
         self.ast._define(
             [],
-            ['DEFS']
+            ['BLOCK']
         )
 
     @graken()
@@ -75,33 +75,9 @@ class SSSLParser(Parser):
             with self._option():
                 self._DFUNC_()
                 self.name_last_node('DFUNC')
-            self._error('no available options')
-
-        self.ast._define(
-            ['DOBJT', 'DFUNC'],
-            []
-        )
-
-    @graken()
-    def _BLOCK_(self):
-        self._token('{')
-        with self._group():
-            with self._choice():
-                with self._option():
-
-                    def block0():
-                        self._INSTR_()
-                        self.add_last_node_to_name('@')
-                    self._positive_closure(block0)
-                with self._option():
-                    self._NULL_()
-                    self.name_last_node('@')
-                self._error('no available options')
-        self._token('}')
-
-    @graken()
-    def _INSTR_(self):
-        with self._choice():
+            with self._option():
+                self._DECLAFF_()
+                self.name_last_node('DECLAFF')
             with self._option():
                 self._DECLAFF_()
                 self.name_last_node('DECLAFF')
@@ -111,13 +87,82 @@ class SSSLParser(Parser):
             with self._option():
                 self._AFF_()
                 self.name_last_node('AFF')
-            with self._option():
-                self._CFUNC_()
-                self.name_last_node('CFUNC')
             self._error('no available options')
 
         self.ast._define(
-            ['DECLAFF', 'DECL', 'AFF', 'CFUNC'],
+            ['DOBJT', 'DFUNC', 'DECLAFF', 'DECL', 'AFF'],
+            []
+        )
+
+    @graken()
+    def _BLOCK_(self):
+        with self._choice():
+            with self._option():
+                self._token('{')
+                self._EMPTY_()
+                self.name_last_node('@')
+                self._token('}')
+            with self._option():
+                self._token('{')
+                with self._group():
+                    with self._choice():
+                        with self._option():
+
+                            def block1():
+                                self._INSTR_()
+                                self.add_last_node_to_name('@')
+                            self._positive_closure(block1)
+                        with self._option():
+                            self._NULL_()
+                            self.name_last_node('@')
+                        self._error('no available options')
+                self._token('}')
+            self._error('no available options')
+
+    @graken()
+    def _INSTR_(self):
+        with self._choice():
+            with self._option():
+                self._COND_()
+                self.name_last_node('@')
+            with self._option():
+                self._OTHER_()
+                self.name_last_node('@')
+            with self._option():
+                self._CFUNC_()
+                self.name_last_node('CFUNC')
+            with self._option():
+                self._DEFS_()
+                self.name_last_node('@')
+            self._error('no available options')
+
+        self.ast._define(
+            ['CFUNC'],
+            []
+        )
+
+    @graken()
+    def _COND_(self):
+        with self._choice():
+            with self._option():
+                self._IF_()
+                self.name_last_node('IF')
+            with self._option():
+                self._ELSE_()
+                self.name_last_node('ELSE')
+            with self._option():
+                self._ELIF_()
+                self.name_last_node('ELIF')
+            with self._option():
+                self._WHILE_()
+                self.name_last_node('WHILE')
+            with self._option():
+                self._DOWHILE_()
+                self.name_last_node('DOWHILE')
+            self._error('no available options')
+
+        self.ast._define(
+            ['IF', 'ELSE', 'ELIF', 'WHILE', 'DOWHILE'],
             []
         )
 
@@ -170,6 +215,118 @@ class SSSLParser(Parser):
 
         self.ast._define(
             ['NAME', 'ARGS'],
+            []
+        )
+
+    @graken()
+    def _OTHER_(self):
+        with self._choice():
+            with self._option():
+                self._RETURN_()
+                self.name_last_node('RETURN')
+            with self._option():
+                self._BREAK_()
+                self.name_last_node('BREAK')
+            self._error('no available options')
+
+        self.ast._define(
+            ['RETURN', 'BREAK'],
+            []
+        )
+
+    @graken()
+    def _RETURN_(self):
+        with self._choice():
+            with self._option():
+                self._token('return')
+                self._EXPR_()
+                self.name_last_node('EXPR')
+            with self._option():
+                self._token('return')
+                self._EMPTY_()
+                self.name_last_node('@')
+            self._error('no available options')
+
+        self.ast._define(
+            ['EXPR'],
+            []
+        )
+
+    @graken()
+    def _BREAK_(self):
+        self._token('break')
+        self._EMPTY_()
+        self.name_last_node('@')
+
+    @graken()
+    def _IF_(self):
+        self._token('if')
+        self._token('(')
+        self._EXPR_()
+        self.name_last_node('EXPR')
+        self._token(')')
+        self._BLOCK_()
+        self.name_last_node('BLOCK')
+
+        self.ast._define(
+            ['EXPR', 'BLOCK'],
+            []
+        )
+
+    @graken()
+    def _ELSE_(self):
+        self._token('else')
+        self._BLOCK_()
+        self.name_last_node('BLOCK')
+
+        self.ast._define(
+            ['BLOCK'],
+            []
+        )
+
+    @graken()
+    def _ELIF_(self):
+        self._token('elif')
+        self._token('(')
+        self._EXPR_()
+        self.name_last_node('EXPR')
+        self._token(')')
+        self._BLOCK_()
+        self.name_last_node('BLOCK')
+
+        self.ast._define(
+            ['EXPR', 'BLOCK'],
+            []
+        )
+
+    @graken()
+    def _WHILE_(self):
+        self._token('while')
+        self._token('(')
+        self._EXPR_()
+        self.name_last_node('EXPR')
+        self._token(')')
+        self._BLOCK_()
+        self.name_last_node('BLOCK')
+
+        self.ast._define(
+            ['EXPR', 'BLOCK'],
+            []
+        )
+
+    @graken()
+    def _DOWHILE_(self):
+        self._token('do')
+        self._BLOCK_()
+        self.name_last_node('BLOCK')
+        self._token('while')
+        self._token('(')
+        self._EXPR_()
+        self.name_last_node('EXPR')
+        self._token(')')
+
+        self.ast._define(
+            ['BLOCK', 'EXPR'],
             []
         )
 
@@ -229,36 +386,41 @@ class SSSLParser(Parser):
     def _DOBJT_(self):
         self._token('class')
         self._nom_()
-        self.name_last_node('Name')
+        self.name_last_node('NAME')
         self._token('{')
 
         def block1():
             self._DMEMB_()
-            self.name_last_node('@')
+            self.add_last_node_to_name('BLOCK')
         self._closure(block1)
         self._token('}')
 
         self.ast._define(
-            ['Name'],
-            []
+            ['NAME'],
+            ['BLOCK']
         )
 
     @graken()
     def _DMEMB_(self):
         with self._choice():
             with self._option():
-                self.__DFUNC_()
-                self.name_last_node('@')
+                self._DFUNC_()
+                self.name_last_node('DFUNC')
             with self._option():
-                self.__DECLAFF_()
-                self.name_last_node('@')
+                self._DECLAFF_()
+                self.name_last_node('DECLAFF')
             with self._option():
-                self.__DECL_()
-                self.name_last_node('@')
+                self._DECL_()
+                self.name_last_node('DECL')
             with self._option():
-                self.__CSTR_()
-                self.name_last_node('@')
+                self._CSTR_()
+                self.name_last_node('CSTR')
             self._error('no available options')
+
+        self.ast._define(
+            ['DFUNC', 'DECLAFF', 'DECL', 'CSTR'],
+            []
+        )
 
     @graken()
     def _DFUNC_(self):
@@ -309,20 +471,14 @@ class SSSLParser(Parser):
 
     @graken()
     def _TYPE_(self):
-        with self._choice():
-            with self._option():
-                self._token('int')
-            with self._option():
-                self._token('float')
-            with self._option():
-                self._token('string')
-            with self._option():
-                self._token('void')
-            self._error('expecting one of: float int string void')
+        self._nom_()
+        self.name_last_node('@')
 
     @graken()
     def _OPER_(self):
         with self._choice():
+            with self._option():
+                self._token('.')
             with self._option():
                 self._token('+')
             with self._option():
@@ -330,8 +486,8 @@ class SSSLParser(Parser):
             with self._option():
                 self._token('*')
             with self._option():
-                self._token('*')
-            self._error('expecting one of: * + -')
+                self._token('/')
+            self._error('expecting one of: * + - . /')
 
     @graken()
     def __EXPR_(self):
@@ -468,6 +624,9 @@ class SSSLSemantics(object):
     def INSTR(self, ast):
         return ast
 
+    def COND(self, ast):
+        return ast
+
     def DECL(self, ast):
         return ast
 
@@ -478,6 +637,30 @@ class SSSLSemantics(object):
         return ast
 
     def CFUNC(self, ast):
+        return ast
+
+    def OTHER(self, ast):
+        return ast
+
+    def RETURN(self, ast):
+        return ast
+
+    def BREAK(self, ast):
+        return ast
+
+    def IF(self, ast):
+        return ast
+
+    def ELSE(self, ast):
+        return ast
+
+    def ELIF(self, ast):
+        return ast
+
+    def WHILE(self, ast):
+        return ast
+
+    def DOWHILE(self, ast):
         return ast
 
     def PARAM(self, ast):

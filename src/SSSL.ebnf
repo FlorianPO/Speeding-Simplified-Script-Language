@@ -1,16 +1,18 @@
 (* __Main__ *)
 
-START = {DEFS+:DEFS}* $ ;
+START = {BLOCK+:DEFS}* $ ;
  
-DEFS = DOBJT:DOBJT | DFUNC:DMAIN | DFUNC:DFUNC;
+DEFS = DOBJT:DOBJT | DFUNC:DMAIN | DFUNC:DFUNC | DECLAFF:DECLAFF | DECLAFF:DECLAFF | DECL:DECL | AFF:AFF;
 
 
 
 (* __Instructions__ *)
 
-BLOCK = '{' ({@+:INSTR}+ | @:NULL) '}' ;
+BLOCK = '{' @:EMPTY '}' | '{' ({@+:INSTR}+ | @:NULL) '}' ;
 
-INSTR = DECLAFF:DECLAFF | DECL:DECL | AFF:AFF | CFUNC:CFUNC ; 
+INSTR = @:COND | @:OTHER | CFUNC:CFUNC | @:DEFS ;
+
+COND = IF:IF | ELSE:ELSE | ELIF:ELIF | WHILE:WHILE | DOWHILE:DOWHILE ;
 
 DECL = TYPE:TYPE NAME:nom ;
 
@@ -19,6 +21,26 @@ DECLAFF = TYPE:TYPE NAME:nom '=' EXPR:EXPR ;
 AFF = NAME:nom '=' EXPR:EXPR ;
 
 CFUNC = NAME:nom ARGS:ARGS ;
+
+OTHER = RETURN:RETURN | BREAK:BREAK ;
+
+RETURN = 'return' EXPR:EXPR | 'return' @:EMPTY ;
+
+BREAK = 'break' @:EMPTY ;
+
+
+
+(* __Conditions__ *)
+
+IF = 'if' '(' EXPR:EXPR ')' BLOCK:BLOCK ; 
+
+ELSE = 'else' BLOCK:BLOCK ; 
+
+ELIF = 'elif' '(' EXPR:EXPR ')' BLOCK:BLOCK ;
+
+WHILE = 'while' '(' EXPR:EXPR ')' BLOCK:BLOCK ; 
+
+DOWHILE = 'do' BLOCK:BLOCK 'while' '(' EXPR:EXPR ')' ;
 
 
 
@@ -34,9 +56,9 @@ EMPTY = {} ;
 
 (* __Objets Fonctions__ *)
 
-DOBJT = 'class' Name:nom '{' { @:DMEMB }* '}' ;
+DOBJT = 'class' NAME:nom '{' {BLOCK+:DMEMB}* '}' ;
 
-DMEMB = @:_DFUNC | @:_DECLAFF | @:_DECL | @:_CSTR;
+DMEMB = DFUNC:DFUNC | DECLAFF:DECLAFF | DECL:DECL | CSTR:CSTR;
 
 DFUNC = 'func' TYPE:TYPE NAME:nom PARAM:PARAM BLOCK:BLOCK ;
 
@@ -48,9 +70,9 @@ CSTR = NAME:nom PARAM:PARAM BLOCK:BLOCK ;
 
 (* __Types Opérateurs__ *)
 
-TYPE = 'int' | 'float' | 'string' | 'void' ;
+TYPE = @:nom ;
 
-OPER = '+' | '-' | '*' | '*' ;
+OPER = '.' | '+' | '-' | '*' | '/' ;
 
 
 

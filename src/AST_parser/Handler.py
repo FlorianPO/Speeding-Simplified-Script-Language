@@ -1,5 +1,6 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
+from Exceptions import *
 from Logger import Logger
 
 # Program parser
@@ -64,3 +65,10 @@ class Handler:
             else:
                 self.i = i # restore state
                 return False
+
+    # check if the next statement is equal to string
+    def checkString(self, string):
+        token = self.next_string()
+        if (not (token == string)):
+            self.logger.logError("Error, unable to match " + string + " and token " + token)
+            raise ErrorParsing()

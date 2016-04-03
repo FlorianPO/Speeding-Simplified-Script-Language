@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 from Nodes.Node import *
 from Nodes.Expression import *
@@ -22,8 +22,7 @@ class Operator(Expression):
         pass
 
     def getType(self):
-        # TODO
-       return Type(self.data, "int")
+       return self.expr1.getType()
 
 class Add(Operator): # Addition
     def __init__(self, data):
@@ -44,4 +43,13 @@ class Div(Operator): # Division
     def __init__(self, data):
         Operator.__init__(self, data)
     def __str__(self):
-        return self.expr1.__str__() + " / " + self.expr2.__str__()
+        return self.expr1.__str__() + " / " + self.expr2.__str()
+
+class Access(Operator):
+    def __init__(self, data):
+        Operator.__init__(self, data)
+    def __str__(self):
+        return self.expr1.__str__() + " . " + self.expr2.__str__()
+
+    def getType(self):
+       return self.expr2.getType()

@@ -1,4 +1,4 @@
-﻿from Exceptions import *
+from Exceptions import *
 
 from Nodes.Node import *
 
@@ -9,10 +9,17 @@ class Expression(Node):
         Node.__init__(self, data)
         self.value_s = "_none_" # string, literal value
 
-    def fill(self):
-        expr = findExpr(self.data)
-        self.__class__ = expr.__class__ # change __class__: Expression(4 + 4) -> Add(4, 4)
-        self.__dict__.update(expr.__dict__) # copy attributes
+    def fill(self, check = True):
+        if (not self.filled):
+            _previous_class = self.data._class
+            self.data._class = None
+            if (check):
+                self.data.Handler.checkString(revDict(self.data.all_dict, self.__class__)) # check for Expression statement
+            expr = findExpr(self.data)
+            self.data._class = _previous_class
+            self.__class__ = expr.__class__ # change __class__: Expression(4 + 4) -> Add(4, 4)
+            self.__dict__.update(expr.__dict__) # copy attributes
+            self.filled = True
 
     def getType(self):
         raise NotImplementedError("getType interface method, problem...")
@@ -22,16 +29,29 @@ class Name(Expression):
     def __init__(self, data, check = True):
         Expression.__init__(self, data)
         self._check = check # check in environment or not
+        self._type = None
 
-    def fill(self):
-        self.value_s = self.data.Handler.next_string()
-        if (self._check): # check environment
-            if (self.data.Block.get(self.value_s) == None):
-                self.data.Logger.logError("Error: " + self.value_s + " is not known")
-                raise ErrorEnvironment()
+    def fill(self, check = True):
+        if (not self.filled):
+            if (check):
+                self.data.Handler.checkString(self.node_name) # check for the right statement
+            self.value_s = self.data.Handler.next_string()
+            if (self._check): # check environment
+                _class = self.data.Block.getClass(self.data._class.__str__())
+                if (_class != None):
+                    self._type = _class.get(self.value_s)
+                    if (self._type == None):
+                        self.data.Logger.logError("Error: " + self.value_s + " is not known in class " + self.data._class.__str__())
+                        raise ErrorEnvironment()
+                else:
+                    self._type = self.data.Block.get(self.value_s)
+                    if (self._type == None):
+                        self.data.Logger.logError("Error: " + self.value_s + " is not known")
+                        raise ErrorEnvironment()
+            self.filled = True
 
     def getType(self):
-        return self.data.Block.get(self.value_s)
+        return self._type
 
     def __str__(self):
         return self.value_s
@@ -41,8 +61,13 @@ class Value(Expression):
     def __init__(self, data):
         Expression.__init__(self, data)
 
-    def fill(self):
-        self.value_s = self.data.Handler.next_string()
+    def fill(self, check = True):
+        if (not self.filled):
+            if (check):
+                self.data.Handler.checkString(self.node_name) # check for the right statement
+            self.value_s = self.data.Handler.next_string()
+            self.filled = True
+
     def getType(self):
         return findType(self.data, self.value_s) # find type
 
@@ -57,14 +82,19 @@ class Type(Node):
             self.keyword = "_none_" # int, float, ...
         else:
             self.keyword = keyword
+            self.filled = True
 
-    def fill(self):
-        token = self.data.Handler.next_string()
-        if (token in self.data.type_list): # check keyword
-            self.keyword = token
-        else:
-            self.data.Logger.logError("Error: " + token + " is not a known type")
-            raise ErrorParsing()
+    def fill(self, check = True):
+        if (not self.filled):
+            if (check):
+                self.data.Handler.checkString(self.node_name) # check for the right statement
+            token = self.data.Handler.next_string()
+            if (token in self.data.type_list or self.data.Block.getClass(token) != None): # check keyword
+                self.keyword = token
+            else:
+                self.data.Logger.logError("Error: " + token + " is not a known type or class")
+                raise ErrorParsing()
+            self.filled = True
 
     def __str__(self):
         return self.keyword
@@ -76,7 +106,7 @@ def findExpr(data):
         right_expr = None
         operator = None
         
-        left_expr = findExpr(data)  
+        left_expr = findExpr(data)
         string = data.Handler.next_string()
         oper = data.all_dict[string](data)
         right_expr = findExpr(data)
@@ -92,7 +122,8 @@ def findExpr(data):
     else: # single expression
         string = data.Handler.next_string()
         expr = data.all_dict[string](data)
-        expr.fill()
+        expr.fill(False)
+        data._class = expr.getType() # save class if an access occures
 
         return expr
 

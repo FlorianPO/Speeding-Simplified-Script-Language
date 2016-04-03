@@ -1,66 +1,95 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 from Nodes.Instruction import *
 from Nodes.Expression import *
 from Nodes.Function import *
+from Nodes.Object import *
+from Nodes.Condition import *
 from Nodes.Operator import *
 from Nodes.Block import *
 
+_INDENT_ = None
 def init():
-    declaration()
-    declaffectation()
-    affectation()
-    
-    functiondef()
-    functioncall()
-    arguments()
-    parameters()
-    block()
+    global _INDENT_
+    _INDENT_ = ""
 
-    name()
-    value()
-    type()
-
-    add()
-    sub()
-    mul()
-    div()
+    DECLARATION()
+    DECLAFFECTATION()
+    AFFECTATION()
     
-def declaration():
+    FUNCTIONDEF()
+    CONSTRUCTORDEF()
+    FUNCTIONCALL()
+    ARGUMENTS()
+    PARAMETERS()
+    BLOCK()
+
+    CLASSDEF()
+    ACCESS()
+
+    RETURN()
+    BREAK()
+
+    IF()
+    ELSE()
+    ELIF()
+    WHILE()
+    DOWHILE()
+
+    NAME()
+    VALUE()
+    TYPE()
+
+    ADD()
+    SUB()
+    MUL()
+    DIV()
+    
+def DECLARATION():
     def __go__(self):
-        return "var " + self.tokens[1].__go__()
+        return "var " + self.name.__go__()
     Declaration.__go__ = __go__
 
-def affectation():
+def AFFECTATION():
     def __go__(self):
-        return self.tokens[0].__go__() + " = " + self.tokens[1].__go__()
+        return self.name.__go__() + " = " + self.expr.__go__()
     Affectation.__go__ = __go__
 
-def declaffectation():
+def DECLAFFECTATION():
     def __go__(self):
-        return self.tokens[1].__go__() + " := " + self.tokens[2].__go__()
+        return self.name.__go__() + " := " + self.expr.__go__()
     Declaffectation.__go__ = __go__
 
-def functioncall():
+def FUNCTIONCALL():
     def __go__(self):
-        return self.tokens[0].__go__() + self.tokens[1].__go__()
+        return self.name.__go__() + self.args.__go__()
     FunctionCall.__go__ = __go__
 
-def functiondef():
+def FUNCTIONDEF():
     def __go__(self):
-        return self.tokens[0].__go__() + " " + self.tokens[1].__go__() + self.tokens[2].__go__() + self.tokens[3].__go__()
+        return self.type.__go__() + " " + self.name.__go__() + self.parm.__go__() + self.block.__go__() + "\n"
     FunctionDef.__go__ = __go__
 
-def arguments():
+def CONSTRUCTORDEF():
     def __go__(self):
+        return self.name.__go__() + self.parm.__go__() + self.block.__go__() + "\n"
+    ConstructorDef.__go__ = __go__
+
+def ARGUMENTS():
+    def __go__(self):
+        _size = len(self.argument_list)
+
+        if (_size == 0):
+            return "()"
+
         string = "("
-        for i in range(0, len(self.argument_list)-1):
+        for i in range(0, _size-1):
             string = string + self.argument_list[i].__go__() + ", "
-        string = string + self.argument_list[len(self.argument_list)-1].__go__() + ")"
+        string = string + self.argument_list[_size-1].__go__() + ")"
         return string
     Arguments.__go__ = __go__
 
-def parameters():
+def PARAMETERS():
     def __go__(self):
         _size = len(self.types)
 
@@ -76,51 +105,106 @@ def parameters():
         return string
     Parameters.__go__ = __go__
 
-def block():
+def BLOCK():
     def __go__(self):
         _size = len(self.instr_list)
 
         if (_size == 0):
             return " {}"
        
+        global _INDENT_
+        _PREVIOUS_INDENT_ = _INDENT_
+        _INDENT_ = _INDENT_ + "\t"
+
         string = " {\n"
         for i in range(0, _size):
-            string = string + "\t" + self.instr_list[i].__go__() + "\n"
-        string = string + "}\n"
+            string = string + _INDENT_ + self.instr_list[i].__go__() + "\n"
+        string = string + _PREVIOUS_INDENT_ + "}"
+        
+        _INDENT_ = _PREVIOUS_INDENT_
+
         return string
     Block.__go__ = __go__
 
-def name():
+def CLASSDEF():
+    def __go__(self):
+        return "class " + self.name.__go__() + self.block.__go__()
+    ClassDef.__go__ = __go__
+
+def ACCESS():
+    def __go__(self):
+        return self.expr1.__go__() + "." + self.expr2.__go__()
+    Access.__go__ = __go__
+
+def RETURN():
+    def __go__(self):
+        if (self.expr == None):
+            return "return;"
+        else:
+            return "return " + self.expr.__go__() + ";"
+    Return.__go__ = __go__
+
+def BREAK():
+    def __go__(self):
+        return "if (" + self.tokens[0].__go__() + ")" + self.tokens[1].__go__()
+    Break.__go__ = __go__
+
+def IF():
+    def __go__(self):
+        return "if (" + self.tokens[0].__go__() + ")" + self.tokens[1].__go__()
+    If.__go__ = __go__
+
+def ELSE():
+    def __go__(self):
+        return self.__str__()
+    Else.__go__ = __go__
+
+def ELIF():
+    def __go__(self):
+        return self.__str__()
+    Elif.__go__ = __go__
+
+def WHILE():
+    def __go__(self):
+        return self.__str__()
+    While.__go__ = __go__
+
+def DOWHILE():
+    def __go__(self):
+        return self.__str__()
+    DoWhile.__go__ = __go__
+
+def NAME():
     def __go__(self):
         return self.__str__()
     Name.__go__ = __go__
 
-def value():
+def VALUE():
     def __go__(self):
         return self.__str__()
     Value.__go__ = __go__
 
-def type():
+def TYPE():
     def __go__(self):
         return self.__str__()
     Type.__go__ = __go__
 
-def add():
+def ADD():
     def __go__(self):
         return self.expr1.__go__() + " + " + self.expr2.__go__()
     Add.__go__ = __go__
 
-def sub():
+def SUB():
     def __go__(self):
         return self.expr1.__go__() + " - " + self.expr2.__go__()
     Sub.__go__ = __go__
 
-def mul():
+def MUL():
     def __go__(self):
         return self.expr1.__go__() + " * " + self.expr2.__go__()
     Mul.__go__ = __go__
 
-def div():
+def DIV():
     def __go__(self):
         return self.expr1.__go__() + " / " + self.expr2.__go__()
     Div.__go__ = __go__
