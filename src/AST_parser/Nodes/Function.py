@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 from Plus import *
 
@@ -10,6 +10,28 @@ from Nodes.Instruction import *
 
 # [Name] [Parameters] [Block]: function(int b) {...}
 class FunctionDef(Node):
+    def __init__(self, data):
+        Node.__init__(self, data)
+
+        self.type = Type(data)
+        self.name = Name(data, False)
+        self.parm = Parameters(data)
+        self.block = Block(data.Block, data)
+
+        self.type.fill()
+        self.name.fill()
+
+        data.Block = self.block # parm need to be in block environment
+        self.parm.fill()
+        data.Block = self.block.parent
+        
+        data.Block.addFunction(self.name.__str__(), self.parm.__key__(), self.type) # add function to environment
+        self.block.fill()
+
+    def __str__(self):
+        return self.type.__str__() + " " + self.name.__str__() + self.parm.__str__() + self.block.__str__()
+
+class DMain(Node):
     def __init__(self, data):
         Node.__init__(self, data)
 
@@ -138,3 +160,4 @@ class Parameters(Node):
 
     def __key__(self): # return an hashmap representation of parameters of the function (list of type)
         return self.types.__repr__()
+

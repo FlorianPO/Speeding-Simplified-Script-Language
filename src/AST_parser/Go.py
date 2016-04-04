@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 from Nodes.Instruction import *
 from Nodes.Expression import *
@@ -88,7 +88,7 @@ def FUNCTIONDEF():
 def DMAIN():
     def __go__(self):
         return "func " + "main" + self.parm.__go__()  + self.block.__go__()
-    Dmain.__go__ = __go__
+    DMain.__go__ = __go__
 
 
 def CONSTRUCTORDEF():
@@ -251,3 +251,4 @@ def PARENTHESE():
     def __go__(self):
         return "(" + self.expr.__go__() + ")"
     Parenthese.__go__ = __go__
+
