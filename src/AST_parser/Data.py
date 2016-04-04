@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 from Logger import Logger
 from Handler import Handler
@@ -17,15 +17,15 @@ class Data:
     def __init__(self):
         # LISTS ___________________________________
         self.instr_dict = {"DECL": Declaration, "AFF": Affectation, "DECLAFF": Declaffectation, 
-                           "DFUNC": FunctionDef, "DMAIN": Dmain, "CFUNC": FunctionCall,
+                           "DFUNC": FunctionDef, "DMAIN": DMain, "CFUNC": FunctionCall,
                            "IF": If, "ELSE": Else, "ELIF": Elif, "WHILE": While, "DOWHILE": DoWhile,
                            "DOBJT": ClassDef, "CSTR": ConstructorDef,
                            "RETURN": Return, "BREAK": Break, "ECHO": Echo}
 
-        self.type_list = ["int", "float", "string", "void"]
+        self.type_list = ["int", "float", "string", "void", "bool"]
         self.expr_dict = {"EXPR": Expression, "TYPE": Type, "NAME": Name, "VAL": Value}
-        self.oper_dict = {"+": Add, "-": Sub, "*": Mul, "/": Div, ".": Access, "==": Equal, "!=": NEqual}
-        self.other_dict = {"PARAM": Parameters, "ARGS": Arguments, "BLOCK": Block, "PARENTH" : Parenthese}
+        self.oper_dict = {"+": Add, "-": Sub, "*": Mul, "/": Div, ".": Access, "==": Equal, "!=": NEqual, "or": Or, "and": And}
+        self.other_dict = {"PARAM": Parameters, "ARGS": Arguments, "BLOCK": Block, "PARENTH": Parenthese}
 
         self.all_dict = {}
         for d in [self.instr_dict, self.expr_dict, self.oper_dict, self.other_dict]:
@@ -37,10 +37,11 @@ class Data:
         self.GlobalBlock = Block(None, self, "GLo")
         self.Block = None # current parsing block
         self._class = None
-        
+
         # OPTIONS ___________________________________
         self.check_type_compability = False
         self.check_access_compability = True
         self.check_test_bool = True
         self.check_environment = True
         self.check_type = True
+
