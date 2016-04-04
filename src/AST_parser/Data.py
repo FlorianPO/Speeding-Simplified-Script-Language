@@ -37,3 +37,10 @@ class Data:
         self.GlobalBlock = Block(None, self, "GLo")
         self.Block = None # current parsing block
         self._class = None
+        
+        # OPTIONS ___________________________________
+        self.check_type_compability = False
+        self.check_access_compability = True
+        self.check_test_bool = True
+        self.check_environment = True
+        self.check_type = True
