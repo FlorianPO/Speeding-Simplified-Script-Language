@@ -72,8 +72,7 @@ CSTR = NAME:nom PARAM:PARAM BLOCK:BLOCK ;
 
 TYPE = @:nom ;
 
-OPER = '.' | '+' | '-' | '*' | '/' ;
-
+OPER = '.' | '+' | '-' | '*' | '/' | '==' | '!='  ;
 
 
 (* __Expressions__ *)

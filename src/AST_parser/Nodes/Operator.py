@@ -53,3 +53,16 @@ class Access(Operator):
 
     def getType(self):
        return self.expr2.getType()
+
+class Equal(Operator):
+    def __init__(self, data):
+        Operator.__init__(self, data)
+    def __str__(self):
+        return self.expr1.__str__() + " == " + self.expr2.__str__()
+
+class NEqual(Operator):
+    def __init__(self, data):
+        Operator.__init__(self, data)
+    def __str__(self):
+        return self.expr1.__str__() + " != " + self.expr2.__str__()
+

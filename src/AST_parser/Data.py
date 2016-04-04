@@ -21,9 +21,9 @@ class Data:
                            "DOBJT": ClassDef, "CSTR": ConstructorDef,
                            "RETURN": Return, "BREAK": Break}
 
-        self.type_list = ["int", "float", "string", "void", "object"] # TODO complete
+        self.type_list = ["int", "float", "string", "void"]
         self.expr_dict = {"EXPR": Expression, "TYPE": Type, "NAME": Name, "VAL": Value}
-        self.oper_dict = {"+": Add, "-": Sub, "*": Mul, "/": Div, ".": Access} # TODO complete
+        self.oper_dict = {"+": Add, "-": Sub, "*": Mul, "/": Div, ".": Access, "==": Equal, "!=": NEqual}
         self.other_dict = {"PARAM": Parameters, "ARGS": Arguments, "BLOCK": Block}
 
         self.all_dict = {}

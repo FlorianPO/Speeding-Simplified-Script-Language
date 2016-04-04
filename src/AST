@@ -1,139 +1,48 @@
 
   "BLOCK": [
-      "DOBJT":  
-        "NAME": "A" 
-        "BLOCK": [
-            "DFUNC":  
-              "TYPE": "int" 
-              "NAME": "meth" 
-              "PARAM": [
-                  "TYPE": "int"
-                  "NAME": "a"
-                  "TYPE": "int"
-                  "NAME": "b"
-              ] 
-              "BLOCK": [
-                  "DECLAFF":  
-                    "TYPE": "int" 
-                    "NAME": "c" 
-                    "EXPR":  
-                      "CFUNC":  
-                        "NAME": "meth" 
-                        "ARGS": [
-                            "EXPR": [
-                                "NAME": "a" 
-                              "+" 
-                                "VAL": "2" 
-                            ]
-                            "EXPR":  
-                              "NAME": "b" 
-                        ]
-                  "RETURN":  
-                    "EXPR":  
-                      "NAME": "c" 
-              ]
-        ]
-      "DOBJT":  
-        "NAME": "B" 
-        "BLOCK": [
-            "DECL":  
-              "TYPE": "A" 
-              "NAME": "clA"
-            "DFUNC":  
-              "TYPE": "B" 
-              "NAME": "methode" 
-              "PARAM": [
-                  "TYPE": "int"
-                  "NAME": "a"
-                  "TYPE": "int"
-                  "NAME": "b"
-                  "TYPE": "int"
-                  "NAME": "c"
-              ] 
-              "BLOCK": [
-                  "AFF":  
-                    "NAME": "a" 
-                    "EXPR": [
-                        "NAME": "b" 
-                      "+" 
-                      [
-                          "NAME": "c" 
-                        "+" 
-                        [
-                            "VAL": "4" 
-                          "+" 
-                          [
-                              "VAL": "5" 
-                            "*" 
-                              "VAL": "7" 
-                          ]
-                        ]
-                      ]
-                    ]
-              ]
-            "CSTR":  
-              "NAME": "B" 
-              "PARAM": [
-                  "TYPE": "int"
-                  "NAME": "b"
-              ] 
-              "BLOCK": [
-                  "DECLAFF":  
-                    "TYPE": "int" 
-                    "NAME": "a" 
-                    "EXPR":  
-                      "VAL": "4" 
-              ]
-        ]
       "DFUNC":  
         "TYPE": "void" 
         "NAME": "Main" 
         "PARAM": [] 
         "BLOCK": [
             "DECLAFF":  
-              "TYPE": "B" 
-              "NAME": "b" 
-              "EXPR":  
-                "CFUNC":  
-                  "NAME": "B" 
-                  "ARGS": [
-                      "EXPR":  
-                        "VAL": "4" 
-                  ]
-            "DECLAFF":  
               "TYPE": "int" 
-              "NAME": "c" 
+              "NAME": "a" 
+              "EXPR":  
+                "VAL": "0" 
+            "IF":  
               "EXPR": [
-                  "NAME": "b" 
-                "." 
-                [
-                    "CFUNC":  
-                      "NAME": "methode" 
-                      "ARGS": [
-                          "EXPR":  
-                            "VAL": "1" 
-                          "EXPR":  
-                            "VAL": "2" 
-                          "EXPR":  
-                            "VAL": "3" 
-                      ]
-                  "." 
-                  [
-                      "NAME": "clA" 
-                    "." 
-                      "CFUNC":  
-                        "NAME": "meth" 
-                        "ARGS": [
-                            "EXPR": [
-                                "VAL": "3" 
-                              "+" 
-                                "VAL": "2" 
-                            ]
-                            "EXPR":  
-                              "VAL": "3" 
-                        ]
-                  ]
-                ]
+                  "NAME": "a" 
+                "==" 
+                  "VAL": "17" 
+              ] 
+              "BLOCK": [
+                  "DECLAFF":  
+                    "TYPE": "int" 
+                    "NAME": "b" 
+                    "EXPR":  
+                      "VAL": "7521" 
+                  "WHILE":  
+                    "EXPR": [
+                        "NAME": "a" 
+                      "==" 
+                        "NAME": "b" 
+                    ] 
+                    "BLOCK": [
+                        "DOWHILE":  
+                          "BLOCK": [
+                              "DECLAFF":  
+                                "TYPE": "int" 
+                                "NAME": "c" 
+                                "EXPR":  
+                                  "VAL": "3" 
+                          ] 
+                          "EXPR": [
+                              "NAME": "a" 
+                            "==" 
+                              "NAME": "b" 
+                          ]
+                    ]
               ]
         ]
   ]

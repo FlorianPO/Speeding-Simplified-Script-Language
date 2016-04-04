@@ -35,6 +35,8 @@ def init():
     ELIF()
     WHILE()
     DOWHILE()
+    EQUAL()
+    NEQUAL()
 
     NAME()
     VALUE()
@@ -146,32 +148,42 @@ def RETURN():
 
 def BREAK():
     def __go__(self):
-        return "if (" + self.tokens[0].__go__() + ")" + self.tokens[1].__go__()
+        return "break"
     Break.__go__ = __go__
+
+def EQUAL():
+    def __go__(self):
+        return self.expr1.__go__() + " == " + self.expr2.__go__()
+    Equal.__go__ = __go__
+
+def NEQUAL():
+    def __go__(self):
+        return self.expr1.__go__() + " != " + self.expr2.__go__()
+    NEqual.__go__ = __go__
 
 def IF():
     def __go__(self):
-        return "if (" + self.tokens[0].__go__() + ")" + self.tokens[1].__go__()
+        return "if (" + self.expr.__go__() + ")" + self.block.__go__()
     If.__go__ = __go__
 
 def ELSE():
     def __go__(self):
-        return self.__str__()
+        return "else" + self.block.__go__()
     Else.__go__ = __go__
 
 def ELIF():
     def __go__(self):
-        return self.__str__()
+        return "else if (" + self.expr.__go__() + ")" + self.block.__go__()
     Elif.__go__ = __go__
 
 def WHILE():
     def __go__(self):
-        return self.__str__()
+        return "while (" + self.expr.__go__() + ")" + self.block.__go__()
     While.__go__ = __go__
 
 def DOWHILE():
     def __go__(self):
-        return self.__str__()
+        return "do" + self.block.__go__() + " while (" + self.expr.__go__() + ")"
     DoWhile.__go__ = __go__
 
 def NAME():

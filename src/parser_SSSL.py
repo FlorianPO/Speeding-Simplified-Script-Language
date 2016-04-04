@@ -17,7 +17,7 @@ from grako.parsing import graken, Parser
 from grako.util import re, RE_FLAGS, generic_main  # noqa
 
 
-__version__ = (2016, 4, 3, 22, 41, 24, 6)
+__version__ = (2016, 4, 4, 8, 20, 38, 0)
 
 __all__ = [
     'SSSLParser',
@@ -487,7 +487,11 @@ class SSSLParser(Parser):
                 self._token('*')
             with self._option():
                 self._token('/')
-            self._error('expecting one of: * + - . /')
+            with self._option():
+                self._token('==')
+            with self._option():
+                self._token('!=')
+            self._error('expecting one of: != * + - . / ==')
 
     @graken()
     def __EXPR_(self):
