@@ -7,6 +7,7 @@ from Nodes.Object import *
 from Nodes.Condition import *
 from Nodes.Operator import *
 from Nodes.Block import *
+from Nodes.FunctionSystem import *
 
 _INDENT_ = None
 def init():
@@ -18,8 +19,10 @@ def init():
     AFFECTATION()
     
     FUNCTIONDEF()
+    DMAIN()
     CONSTRUCTORDEF()
     FUNCTIONCALL()
+    ECHO()
     ARGUMENTS()
     PARAMETERS()
     BLOCK()
@@ -46,10 +49,11 @@ def init():
     SUB()
     MUL()
     DIV()
+    PARENTHESE()
     
 def DECLARATION():
     def __go__(self):
-        return "var " + self.name.__go__()
+        return "var " + self.name.__go__() + " "+self.type.__go__()
     Declaration.__go__ = __go__
 
 def AFFECTATION():
@@ -59,7 +63,7 @@ def AFFECTATION():
 
 def DECLAFFECTATION():
     def __go__(self):
-        return self.name.__go__() + " := " + self.expr.__go__()
+        return "var " + self.name.__go__() + " " + self.type.__go__() + " = " + self.expr.__go__()
     Declaffectation.__go__ = __go__
 
 def FUNCTIONCALL():
@@ -67,10 +71,25 @@ def FUNCTIONCALL():
         return self.name.__go__() + self.args.__go__()
     FunctionCall.__go__ = __go__
 
+def ECHO():
+    def __go__(self):
+        return "fmt.Println(" + self.expr.__go__() + ")"
+    Echo.__go__ = __go__
+
+
 def FUNCTIONDEF():
     def __go__(self):
-        return self.type.__go__() + " " + self.name.__go__() + self.parm.__go__() + self.block.__go__() + "\n"
+        string = "func " + self.name.__go__() + self.parm.__go__()
+        if(self.type.__str__() != "void"):
+            string = string + " " + self.type.__go__()
+        return string  + self.block.__go__()
     FunctionDef.__go__ = __go__
+
+def DMAIN():
+    def __go__(self):
+        return "func " + "main" + self.parm.__go__()  + self.block.__go__()
+    Dmain.__go__ = __go__
+
 
 def CONSTRUCTORDEF():
     def __go__(self):
@@ -100,7 +119,7 @@ def PARAMETERS():
 
         string = "("
         for i in range(0, _size-1):
-            string = string + self.types[i].__go__() + " " + self.names[i].__go__() + ", "
+            string = string + self.names[i].__go__() + " " + self.types[i].__go__() + ", "
         string = string + self.types[_size-1].__go__() + " " + self.names[_size-1].__go__()
         string = string + ")"
 
@@ -108,25 +127,32 @@ def PARAMETERS():
     Parameters.__go__ = __go__
 
 def BLOCK():
-    def __go__(self):
+    def __go__(self,accolade=True):
         _size = len(self.instr_list)
 
-        if (_size == 0):
+        if (_size == 0 and accolade):
             return " {}"
+        elif (_size == 0):
+            return ""
        
-        global _INDENT_
-        _PREVIOUS_INDENT_ = _INDENT_
-        _INDENT_ = _INDENT_ + "\t"
-
-        string = " {\n"
-        for i in range(0, _size):
-            string = string + _INDENT_ + self.instr_list[i].__go__() + "\n"
-        string = string + _PREVIOUS_INDENT_ + "}"
-        
-        _INDENT_ = _PREVIOUS_INDENT_
-
+       
+        if (accolade):
+           global _INDENT_
+           _PREVIOUS_INDENT_ = _INDENT_
+           _INDENT_ = _INDENT_ + "\t"
+           string = _PREVIOUS_INDENT_ + "{\n"
+           for i in range(0, _size):
+               string = string + _INDENT_ + self.instr_list[i].__go__() + "\n"
+           string = string + _PREVIOUS_INDENT_ + "}"
+           _INDENT_ = _PREVIOUS_INDENT_
+        else:
+           for i in range(0, _size):
+               string = self.instr_list[i].__go__() + "\n"
+               
         return string
     Block.__go__ = __go__
+
+
 
 def CLASSDEF():
     def __go__(self):
@@ -141,9 +167,9 @@ def ACCESS():
 def RETURN():
     def __go__(self):
         if (self.expr == None):
-            return "return;"
+            return ""
         else:
-            return "return " + self.expr.__go__() + ";"
+            return "return " + self.expr.__go__()
     Return.__go__ = __go__
 
 def BREAK():
@@ -163,7 +189,7 @@ def NEQUAL():
 
 def IF():
     def __go__(self):
-        return "if (" + self.expr.__go__() + ")" + self.block.__go__()
+        return "if " + self.expr.__go__() + self.block.__go__()
     If.__go__ = __go__
 
 def ELSE():
@@ -173,17 +199,17 @@ def ELSE():
 
 def ELIF():
     def __go__(self):
-        return "else if (" + self.expr.__go__() + ")" + self.block.__go__()
+        return "else if " + self.expr.__go__() + self.block.__go__()
     Elif.__go__ = __go__
 
 def WHILE():
     def __go__(self):
-        return "while (" + self.expr.__go__() + ")" + self.block.__go__()
+        return "for " + self.expr.__go__()  + self.block.__go__()
     While.__go__ = __go__
 
 def DOWHILE():
     def __go__(self):
-        return "do" + self.block.__go__() + " while (" + self.expr.__go__() + ")"
+        return self.block.__go__(False) + _INDENT_ +"for " + self.expr.__go__() + self.block.__go__()
     DoWhile.__go__ = __go__
 
 def NAME():
@@ -220,3 +246,8 @@ def DIV():
     def __go__(self):
         return self.expr1.__go__() + " / " + self.expr2.__go__()
     Div.__go__ = __go__
+
+def PARENTHESE():
+    def __go__(self):
+        return "(" + self.expr.__go__() + ")"
+    Parenthese.__go__ = __go__

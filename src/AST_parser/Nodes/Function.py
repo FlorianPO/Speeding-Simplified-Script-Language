@@ -43,17 +43,18 @@ class FunctionCall(Expression): # this node is kind of special since it's both a
         self.name.fill()
         self.args.fill()
 
-        _class = data.Block.getClass(data._class.__str__())
-        if (_class != None):
-            self._type = _class.getFunction(self.name.__str__(), self.args.__key__())
-            if (self._type == None):
-                data.Logger.logError("Error: " + self.name.__str__() + self.args.__key__() +  " function is not known in class " + data._class.__str__())
-                raise ErrorEnvironment()
-        else: # test if function exist in environment (name + args)
-            self._type = data.Block.getFunction(self.name.__str__(), self.args.__key__())
-            if (self._type == None):
-                data.Logger.logError("Error: " + self.name.__str__() + self.args.__key__() +  " function is not known")
-                raise ErrorEnvironment()
+        if (data.check_environment):
+            _class = data.Block.getClass(data._class.__str__())
+            if (_class != None):
+                self._type = _class.getFunction(self.name.__str__(), self.args.__key__())
+                if (self._type == None):
+                    data.Logger.logError("Error: " + self.name.__str__() + self.args.__key__() +  " function is not known in class " + data._class.__str__())
+                    raise ErrorEnvironment()
+            else: # test if function exist in environment (name + args)
+                self._type = data.Block.getFunction(self.name.__str__(), self.args.__key__())
+                if (self._type == None):
+                    data.Logger.logError("Error: " + self.name.__str__() + self.args.__key__() +  " function is not known")
+                    raise ErrorEnvironment()
         self.filled = True
             
     def getType(self): # returns type of function

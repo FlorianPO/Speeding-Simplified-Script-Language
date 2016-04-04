@@ -1,6 +1,6 @@
 
 start:
-	python3 Parser.py
+	python3 Parser.py > programResult.go
 	
 clean:
 	rm -f *~

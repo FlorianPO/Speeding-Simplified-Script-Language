@@ -35,9 +35,10 @@ class Declaffectation(Node):
         self.name.fill()
         self.expr.fill()
         
-        if (self.type.__str__() != self.expr.getType().__str__()): # test type compability
-            data.Logger.logError("Error: " + self.type.__str__() + " and " + self.expr.getType().__str__() + " are not compatible")
-            raise ErrorType()
+        if (data.check_type_compability):
+            if (self.type.__str__() != self.expr.getType().__str__()): # test type compability
+                data.Logger.logError("Error: " + self.type.__str__() + " and " + self.expr.getType().__str__() + " are not compatible")
+                raise ErrorType()
 
         data.Block.add(self.name.__str__(), self.type) # add variable to environment
 
@@ -55,13 +56,15 @@ class Affectation(Node):
         self.name.fill()
         self.expr.fill()
 
-        if (data.Block.get(self.name.__str__()) == None): # test if variable exists in environment
-            data.Logger.logError("Error: " + self.name.__str__() + " is not known")
-            raise ErrorEnvironment()
+        if (data.check_environment):
+            if (data.Block.get(self.name.__str__()) == None): # test if variable exists in environment
+                data.Logger.logError("Error: " + self.name.__str__() + " is not known")
+                raise ErrorEnvironment()
 
-        if (data.Block.get(self.name.__str__()).__str__() != self.expr.getType().__str__()): # test type compability
-            data.Logger.logError("Error: " + data.Block.get(self.name.__str__()).__str__() + " and " + self.expr.getType().__str__() + " are not compatible")
-            raise ErrorType()
+        if (data.check_type_compability):
+            if (data.Block.get(self.name.__str__()).__str__() != self.expr.getType().__str__()): # test type compability
+                data.Logger.logError("Error: " + data.Block.get(self.name.__str__()).__str__() + " and " + self.expr.getType().__str__() + " are not compatible")
+                raise ErrorType()
 
         data.Block.modify(self.name.__str__(), self.expr.getType()) # modify variable in environment
 
@@ -75,7 +78,9 @@ class Return(Node):
         self.expr = None
 
         if (data.Handler.check("[")):
-            data.Handler.check("]")
+            if (not data.Handler.check("]")):
+                self.data.Logger.logError("Error: unable to find end")
+                raise ErrorParsing()
         else:
             self.expr = Expression(data)
             self.expr.fill()
@@ -92,8 +97,12 @@ class Break(Node):
 
         self.expr = ""
 
-        data.Handler.check("[")
-        data.Handler.check("]")
+        if (not data.Handler.check("[")):
+            self.data.Logger.logError("Error: unable to find begining")
+            raise ErrorParsing()
+        if (not data.Handler.check("]")):
+            self.data.Logger.logError("Error: unable to find end")
+            raise ErrorParsing()
 
     def __str__(self):
         return "break;"

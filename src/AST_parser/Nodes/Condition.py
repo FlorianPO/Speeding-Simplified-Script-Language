@@ -15,9 +15,10 @@ class If(Node):
         self.expr.fill()
         self.block.fill()
         
-        if (self.expr.getType().__str__() != "bool"): # test type compability
-            data.Logger.logError("Error: bool and " + self.expr.getType().__str__() + " are not compatible")
-            raise ErrorType()
+        if (data.check_test_bool):
+            if (self.expr.getType().__str__() != "bool"): # test type compability
+                data.Logger.logError("Error: bool and " + self.expr.getType().__str__() + " are not compatible")
+                raise ErrorType()
 
     def __str__(self):
         return "if (" + self.expr.__str__() + ")" + self.block.__str__()
@@ -33,9 +34,10 @@ class While(Node):
         self.expr.fill()
         self.block.fill()
         
-        if (self.expr.getType().__str__() != "bool"): # test type compability
-            data.Logger.logError("Error: bool and " + self.expr.getType().__str__() + " are not compatible")
-            raise ErrorType()
+        if (data.check_test_bool):
+            if (self.expr.getType().__str__() != "bool"): # test type compability
+                data.Logger.logError("Error: bool and " + self.expr.getType().__str__() + " are not compatible")
+                raise ErrorType()
 
     def __str__(self):
         return "while (" + self.expr.__str__() + ")" + self.block.__str__()
@@ -62,9 +64,10 @@ class Elif(Node):
         self.expr.fill()
         self.block.fill()
         
-        if (self.expr.getType().__str__() != "bool"): # test type compability
-            data.Logger.logError("Error: bool and " + self.expr.getType().__str__() + " are not compatible")
-            raise ErrorType()
+        if (data.check_test_bool):
+            if (self.expr.getType().__str__() != "bool"): # test type compability
+                data.Logger.logError("Error: bool and " + self.expr.getType().__str__() + " are not compatible")
+                raise ErrorType()
 
     def __str__(self):
         return "else if (" + self.expr.__str__() + ")" + self.block.__str__()
@@ -80,9 +83,10 @@ class DoWhile(Node):
         self.block.fill()
         self.expr.fill()
        
-        if (self.expr.getType().__str__() != "bool"): # test type compability
-            data.Logger.logError("Error: bool and " + self.expr.getType().__str__() + " are not compatible")
-            raise ErrorType()
+        if (data.check_test_bool):
+            if (self.expr.getType().__str__() != "bool"): # test type compability
+                data.Logger.logError("Error: bool and " + self.expr.getType().__str__() + " are not compatible")
+                raise ErrorType()
 
     def __str__(self):
         return "do" + self.block.__str__() + " while (" + self.expr.__str__() + ")"

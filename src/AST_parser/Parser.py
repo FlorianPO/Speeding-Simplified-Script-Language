@@ -21,14 +21,15 @@ def main():
 
     parse(data)
 
-    data.Logger.printAllLog()
-    print("")
-    print("Result:")
-    for instr in data.GlobalBlock.instr_list:
-        print(instr.__str__())
-    print("")
-    print("Go:")
-
+    #data.Logger.printAllLog()
+    #print("")
+    #print("Result:")
+    #for instr in data.GlobalBlock.instr_list:
+        #print(instr.__str__())
+    #print("")
+    #print("Go:")
+    
+    print("package main\nimport \"fmt\"\n");
     Go.init()
     for instr in data.GlobalBlock.instr_list:
         print(instr.__go__())

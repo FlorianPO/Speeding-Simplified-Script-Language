@@ -16,14 +16,15 @@ class Operator(Expression):
         self.expr1 = expr1
         self.expr2 = expr2
         
-        if (self.compability != []):
-            if (not (self.expr1.getType().__str__() in self.compability and self.expr2.getType().__str__() in self.compability)):
-                data.Logger.logError("Error: " + self.expr1.getType().__str__() + " and " + self.expr2.getType().__str__() + " are not compatible")
-                raise ErrorType()
-        else:
-            if (self.expr1.getType().__str__() != self.expr2.getType().__str__()):
-                data.Logger.logError("Error: " + self.expr1.getType().__str__() + " and " + self.expr2.getType().__str__() + " are not compatible")
-                raise ErrorType()
+        if (self.data.check_type_compability):
+            if (self.compability != []):
+                if (not (self.expr1.getType().__str__() in self.compability and self.expr2.getType().__str__() in self.compability)):
+                    data.Logger.logError("Error: " + self.expr1.getType().__str__() + " and " + self.expr2.getType().__str__() + " are not compatible")
+                    raise ErrorType()
+            else:
+                if (self.expr1.getType().__str__() != self.expr2.getType().__str__()):
+                    data.Logger.logError("Error: " + self.expr1.getType().__str__() + " and " + self.expr2.getType().__str__() + " are not compatible")
+                    raise ErrorType()
 
     def getType(self):
        return self.expr1.getType()
@@ -83,3 +84,28 @@ class NEqual(Operator):
 
     def getType(self):
        return Type(self.data, "bool")
+
+class Or(Operator):
+    def __init__(self, data):
+        Operator.__init__(self, data)
+        self.compability = ["bool"]
+    def __str__(self):
+        return self.expr1.__str__() + " or " + self.expr2.__str__()
+
+class And(Operator):
+    def __init__(self, data):
+        Operator.__init__(self, data)
+        self.compability = ["bool"]
+    def __str__(self):
+        return self.expr1.__str__() + " and " + self.expr2.__str__()
+
+class Parenthese(Node):
+    def __init__(self, data):
+        Node.__init__(self, data)
+
+        self.expr = Expression(data)
+        self.expr.fill(False)
+
+    def __str__(self):
+        return "( " + self.expr.__str__() + " )"
+

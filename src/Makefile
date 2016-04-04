@@ -1,7 +1,7 @@
 
 start: parser
 	python3 test_SSSL.py > full_AST
-	python3 AST_cleaner.py > AST
+	python3 AST_cleaner.py > AST_parser/AST
 	
 parser:
 	python3 -m grako -m SSSL -o parser_SSSL.py SSSL.ebnf
@@ -13,6 +13,6 @@ clean:
 
 mrproper: clean
 	rm -f parser_SSSL.py
-	rm -f AST
+	rm -f AST_parser/AST
 
 	

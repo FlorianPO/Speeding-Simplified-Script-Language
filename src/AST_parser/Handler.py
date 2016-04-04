@@ -54,11 +54,13 @@ class Handler:
         return string
 
     # Check the next character with string, else handler is unchanged 
-    def check(self, string):
+    def check(self, string, restore=False):
         i = self.i # save state
         while (self.hasNext()):
             c = self.next()
             if (c == string[0]):
+                if (restore):
+                    self.i = i # restore state
                 return True
             if (Handler.ignore(c)):
                 continue

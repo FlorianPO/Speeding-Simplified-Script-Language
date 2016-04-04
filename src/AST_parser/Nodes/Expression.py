@@ -36,7 +36,7 @@ class Name(Expression):
             if (check):
                 self.data.Handler.checkString(self.node_name) # check for the right statement
             self.value_s = self.data.Handler.next_string()
-            if (self._check): # check environment
+            if (self._check and self.data.check_environment): # check environment
                 _class = self.data.Block.getClass(self.data._class.__str__())
                 if (_class != None):
                     self._type = _class.get(self.value_s)
@@ -89,11 +89,11 @@ class Type(Node):
             if (check):
                 self.data.Handler.checkString(self.node_name) # check for the right statement
             token = self.data.Handler.next_string()
-            if (token in self.data.type_list or self.data.Block.getClass(token) != None): # check keyword
-                self.keyword = token
-            else:
-                self.data.Logger.logError("Error: " + token + " is not a known type or class")
-                raise ErrorParsing()
+            if (self.data.check_type):
+                if (not(token in self.data.type_list or self.data.Block.getClass(token) != None)): # check keyword
+                    self.data.Logger.logError("Error: " + token + " is not a known type or class")
+                    raise ErrorParsing()
+            self.keyword = token
             self.filled = True
 
     def __str__(self):
@@ -101,22 +101,18 @@ class Type(Node):
 
 # Return the true expression object (such as Name, Value, Type, ...)
 def findExpr(data):
-    if (data.Handler.check("[")): # list
-        left_expr = None
-        right_expr = None
-        operator = None
-        
+    if (data.Handler.check("[")): # operator present
         left_expr = findExpr(data)
-        string = data.Handler.next_string()
-        oper = data.all_dict[string](data)
-        right_expr = findExpr(data)
+        right_expr = None
+        oper = None
+        while (not data.Handler.check("]")):
+            string = data.Handler.next_string()
+            oper = data.all_dict[string](data)
+            
+            right_expr = findExpr(data)
 
-        oper.setExpr(left_expr, right_expr)
-        
-        if (not data.Handler.check("]")):
-            self.data.Logger.logError("Error: unable to find end of expression")
-            raise ErrorParsing()
-
+            oper.setExpr(left_expr, right_expr)
+            left_expr = oper
         return oper
     else: # single expression
         string = data.Handler.next_string()
