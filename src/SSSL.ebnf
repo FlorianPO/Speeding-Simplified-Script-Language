@@ -2,7 +2,7 @@
 
 START = {BLOCK+:DEFS}* $ ;
  
-DEFS = DOBJT:DOBJT | DFUNC:DMAIN | DFUNC:DFUNC | DECLAFF:DECLAFF | DECLAFF:DECLAFF | DECL:DECL | AFF:AFF;
+DEFS = DOBJT:DOBJT | DMAIN:DMAIN | DFUNC:DFUNC | DECLAFF:DECLAFF | DECLAFF:DECLAFF | DECL:DECL | AFF:AFF ;
 
 
 
@@ -22,11 +22,13 @@ AFF = NAME:nom '=' EXPR:EXPR ;
 
 CFUNC = NAME:nom ARGS:ARGS ;
 
-OTHER = RETURN:RETURN | BREAK:BREAK ;
+OTHER = RETURN:RETURN | BREAK:BREAK | ECHO:ECHO ;
 
 RETURN = 'return' EXPR:EXPR | 'return' @:EMPTY ;
 
 BREAK = 'break' @:EMPTY ;
+
+ECHO = 'echo' EXPR:EXPR ;
 
 
 
@@ -70,21 +72,35 @@ CSTR = NAME:nom PARAM:PARAM BLOCK:BLOCK ;
 
 (* __Types Opérateurs__ *)
 
-TYPE = @:nom ;
+TYPE = @:PTYPE | @:nom ;
 
-OPER = '.' | '+' | '-' | '*' | '/' | '==' | '!='  ;
+OPER = '.' | '+' | '-' | '*' | '/' | '==' | '!=' | 'or' | 'and' ;
+
+PTYPE = 'int' | 'float' | 'string' | 'void' | 'bool' ;
+
+KEYW =  @:PTYPE | 'return' | 'back' | 'or' | 'and' | 'class' | 'func' | 'echo' ;
 
 
 
 (* __Expressions__ *)
 
-EXPR = '(' @:EXPR_PAR ')' | @:EXPR_PAR ;
+EXPR = @:or_EXPR ;
 
-EXPR_PAR = @:t_EXPR @:OPER @:EXPR | @:t_EXPR ;
+or_EXPR = @:and_EXPR {@:'or' @:and_EXPR}* ;
 
-t_EXPR = CFUNC:CFUNC | NAME:nom | VAL:val ;
+and_EXPR = @:e_EXPR {@:'and' @:e_EXPR}* ;
 
-nom = /[a-zA-Z_][a-zA-Z0-9_]*/ ;
+e_EXPR = @:a_EXPR {@:('==' | '!=') @:a_EXPR}* ;
+
+a_EXPR = @:m_EXPR {@:('+' | '-') @:m_EXPR}* ;
+
+m_EXPR = @:p_EXPR {@:('*' | '/') @:p_EXPR}* ;
+
+p_EXPR = @:t_EXPR {@:('.') @:t_EXPR}* ;
+
+t_EXPR = '(' @:EXPR ')' | CFUNC:CFUNC | NAME:nom | VAL:val ;
+   
+nom = !KEYW /[a-zA-Z_][a-zA-Z0-9_]*/ ;
 
 val = /[0-9]+[.]?[0-9]*/ ;
 
