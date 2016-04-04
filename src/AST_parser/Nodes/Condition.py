@@ -14,7 +14,10 @@ class If(Node):
        
         self.expr.fill()
         self.block.fill()
-        # TODO test if boolean
+        
+        if (self.expr.getType().__str__() != "bool"): # test type compability
+            data.Logger.logError("Error: bool and " + self.expr.getType().__str__() + " are not compatible")
+            raise ErrorType()
 
     def __str__(self):
         return "if (" + self.expr.__str__() + ")" + self.block.__str__()
@@ -29,7 +32,10 @@ class While(Node):
        
         self.expr.fill()
         self.block.fill()
-        # TODO test if boolean
+        
+        if (self.expr.getType().__str__() != "bool"): # test type compability
+            data.Logger.logError("Error: bool and " + self.expr.getType().__str__() + " are not compatible")
+            raise ErrorType()
 
     def __str__(self):
         return "while (" + self.expr.__str__() + ")" + self.block.__str__()
@@ -41,7 +47,6 @@ class Else(Node):
 
         self.block = Block(data.Block, data)
         self.block.fill()
-        # TODO "else" if "if" before 
 
     def __str__(self):
         return "else" + self.block.__str__()
@@ -56,7 +61,10 @@ class Elif(Node):
        
         self.expr.fill()
         self.block.fill()
-        # TODO test if boolean
+        
+        if (self.expr.getType().__str__() != "bool"): # test type compability
+            data.Logger.logError("Error: bool and " + self.expr.getType().__str__() + " are not compatible")
+            raise ErrorType()
 
     def __str__(self):
         return "else if (" + self.expr.__str__() + ")" + self.block.__str__()
@@ -71,7 +79,10 @@ class DoWhile(Node):
        
         self.block.fill()
         self.expr.fill()
-        # TODO test if boolean
+       
+        if (self.expr.getType().__str__() != "bool"): # test type compability
+            data.Logger.logError("Error: bool and " + self.expr.getType().__str__() + " are not compatible")
+            raise ErrorType()
 
     def __str__(self):
         return "do" + self.block.__str__() + " while (" + self.expr.__str__() + ")"

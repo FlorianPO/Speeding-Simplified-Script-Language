@@ -1,4 +1,4 @@
-from Exceptions import *
+﻿from Exceptions import *
 
 from Nodes.Node import *
 
@@ -111,8 +111,7 @@ def findExpr(data):
         oper = data.all_dict[string](data)
         right_expr = findExpr(data)
 
-        oper.setLeftExpr(left_expr)
-        oper.setRightExpr(right_expr)
+        oper.setExpr(left_expr, right_expr)
         
         if (not data.Handler.check("]")):
             self.data.Logger.logError("Error: unable to find end of expression")

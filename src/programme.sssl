@@ -1,11 +1,4 @@
+
 void Main() {
-    int a = 0
-    if (a == 17) {
-        int b = 7521
-        while (a == b) {
-            do {
-                int c = 3
-            } while (a == b)
-        }
-    }
+    int a = (456641)
 }

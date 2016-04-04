@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 
 from Logger import Logger
 from Handler import Handler
@@ -21,7 +21,7 @@ class Data:
                            "DOBJT": ClassDef, "CSTR": ConstructorDef,
                            "RETURN": Return, "BREAK": Break}
 
-        self.type_list = ["int", "float", "string", "void"]
+        self.type_list = ["bool", "int", "float", "string", "void"]
         self.expr_dict = {"EXPR": Expression, "TYPE": Type, "NAME": Name, "VAL": Value}
         self.oper_dict = {"+": Add, "-": Sub, "*": Mul, "/": Div, ".": Access, "==": Equal, "!=": NEqual}
         self.other_dict = {"PARAM": Parameters, "ARGS": Arguments, "BLOCK": Block}

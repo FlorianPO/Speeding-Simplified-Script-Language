@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 
 from Plus import *
 
@@ -137,4 +137,3 @@ class Parameters(Node):
 
     def __key__(self): # return an hashmap representation of parameters of the function (list of type)
         return self.types.__repr__()
-

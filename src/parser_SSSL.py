@@ -17,7 +17,7 @@ from grako.parsing import graken, Parser
 from grako.util import re, RE_FLAGS, generic_main  # noqa
 
 
-__version__ = (2016, 4, 4, 8, 20, 38, 0)
+__version__ = (2016, 4, 4, 9, 42, 12, 0)
 
 __all__ = [
     'SSSLParser',
@@ -494,17 +494,20 @@ class SSSLParser(Parser):
             self._error('expecting one of: != * + - . / ==')
 
     @graken()
-    def __EXPR_(self):
-        self._EXPR_()
-        self.name_last_node('EXPR')
-
-        self.ast._define(
-            ['EXPR'],
-            []
-        )
+    def _EXPR_(self):
+        with self._choice():
+            with self._option():
+                self._token('(')
+                self._EXPR_PAR_()
+                self.name_last_node('@')
+                self._token(')')
+            with self._option():
+                self._EXPR_PAR_()
+                self.name_last_node('@')
+            self._error('no available options')
 
     @graken()
-    def _EXPR_(self):
+    def _EXPR_PAR_(self):
         with self._choice():
             with self._option():
                 self._t_EXPR_()
@@ -539,15 +542,11 @@ class SSSLParser(Parser):
 
     @graken()
     def _nom_(self):
-        self._pattern(r'[a-zA-Z_]+')
-
-    @graken()
-    def _tout_(self):
-        self._pattern(r'[0-9a-zA-Z_]+')
+        self._pattern(r'[a-zA-Z_][a-zA-Z0-9_]*')
 
     @graken()
     def _val_(self):
-        self._pattern(r'[0-9]+')
+        self._pattern(r'[0-9]+[.]?[0-9]*')
 
     @graken()
     def _NULL_(self):
@@ -611,6 +610,16 @@ class SSSLParser(Parser):
 
         self.ast._define(
             ['CSTR'],
+            []
+        )
+
+    @graken()
+    def __EXPR_(self):
+        self._EXPR_()
+        self.name_last_node('EXPR')
+
+        self.ast._define(
+            ['EXPR'],
             []
         )
 
@@ -697,19 +706,16 @@ class SSSLSemantics(object):
     def OPER(self, ast):
         return ast
 
-    def _EXPR(self, ast):
+    def EXPR(self, ast):
         return ast
 
-    def EXPR(self, ast):
+    def EXPR_PAR(self, ast):
         return ast
 
     def t_EXPR(self, ast):
         return ast
 
     def nom(self, ast):
-        return ast
-
-    def tout(self, ast):
         return ast
 
     def val(self, ast):
@@ -734,6 +740,9 @@ class SSSLSemantics(object):
         return ast
 
     def _CSTR(self, ast):
+        return ast
+
+    def _EXPR(self, ast):
         return ast
 
 

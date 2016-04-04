@@ -9,41 +9,7 @@
               "TYPE": "int" 
               "NAME": "a" 
               "EXPR":  
-                "VAL": "0" 
-            "IF":  
-              "EXPR": [
-                  "NAME": "a" 
-                "==" 
-                  "VAL": "17" 
-              ] 
-              "BLOCK": [
-                  "DECLAFF":  
-                    "TYPE": "int" 
-                    "NAME": "b" 
-                    "EXPR":  
-                      "VAL": "7521" 
-                  "WHILE":  
-                    "EXPR": [
-                        "NAME": "a" 
-                      "==" 
-                        "NAME": "b" 
-                    ] 
-                    "BLOCK": [
-                        "DOWHILE":  
-                          "BLOCK": [
-                              "DECLAFF":  
-                                "TYPE": "int" 
-                                "NAME": "c" 
-                                "EXPR":  
-                                  "VAL": "3" 
-                          ] 
-                          "EXPR": [
-                              "NAME": "a" 
-                            "==" 
-                              "NAME": "b" 
-                          ]
-                    ]
-              ]
+                "VAL": "456641" 
         ]
   ]
 

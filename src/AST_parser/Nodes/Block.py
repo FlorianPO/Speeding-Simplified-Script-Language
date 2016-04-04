@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 
 from Exceptions import *
 from Logger import Logger
@@ -17,7 +17,14 @@ class Block(Node):
         self._envClass_dict = {} # class environment
 
     # Add a variable to environment
-    def add(self, name, type): 
+    def add(self, name, type):
+        if (not name in self._env_dict): # check in current environment
+           self._env_dict[name] = type
+        else:
+            self.data.Logger.logError("Error: " + name + " already exists")
+            raise ErrorDeclaration()
+
+    def addAll(self, name, type):
         if (self.get(name) == None): # check if it doesn't exist yet
             self._env_dict[name] = type
         else:
@@ -54,6 +61,13 @@ class Block(Node):
 
     # Add a function to environment
     def addFunction(self, name, param, return_type):
+        if (not (name, param) in self._envFunc_dict): # check if it doesn't exist yet
+            self._envFunc_dict[(name, param)] = return_type
+        else:
+            self.data.Logger.logError("Error: " + name + " function already exists")
+            raise ErrorDeclaration()
+
+    def addFunctionAll(self, name, param, return_type):
         if (self.getFunction(name, param) == None): # check if it doesn't exist yet
             self._envFunc_dict[(name, param)] = return_type
         else:
@@ -90,6 +104,13 @@ class Block(Node):
 
     # Add a class to environment
     def addClass(self, name, _class):
+        if (not name in self._envClass_dict): # check if it doesn't exist yet
+            self._envClass_dict[name] = _class
+        else:
+            self.data.Logger.logError("Error: " + name + " class already exists")
+            raise ErrorDeclaration()
+
+    def addClassAll(self, name, _class):
         if (self.getClass(name) == None): # check if it doesn't exist yet
             self._envClass_dict[name] = _class
         else:
