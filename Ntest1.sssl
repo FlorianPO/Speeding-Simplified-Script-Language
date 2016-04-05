@@ -1,0 +1,6 @@
+void Main() 
+{
+    int a;
+    int a = 13;
+    
+}

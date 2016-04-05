@@ -1,0 +1,6 @@
+void Main() 
+{
+    echoln('Test 2 :');
+    int c = 1 + 5 * 2;
+    echo('1 + 5 * 2 =');echoln(c);
+}

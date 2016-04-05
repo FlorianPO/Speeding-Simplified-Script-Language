@@ -1,0 +1,36 @@
+func int add(int a, int b)
+{
+	return(a+b);
+}
+
+func float additionFloat(float a, float b)
+{
+	float c = a+b;
+	return(c);
+}
+
+func int sous(int a, int b)
+{
+	return(a-b);
+}
+
+func int diff(int a, int b, int c)
+{
+	return(sous(a,b) - c);
+}
+
+void Main()
+{
+	echoln('Test 4 :');
+	int a=10;
+	int b=5;
+	int c= 4;
+	float d=3.5;
+	float e = 2.6;
+	a=add(a,b);
+	echo('a = '); echoln(a);
+	d=additionFloat(d,e);
+	echo('d = '); echoln(d);
+	a=diff(a,b,c);
+	echo('a = '); echoln(a);
+}

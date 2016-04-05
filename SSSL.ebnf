@@ -1,0 +1,127 @@
+(* __Main__ *)
+
+START = {BLOCK+:DEFS}* $ ;
+ 
+DEFS = DOBJT:DOBJT | DMAIN:DMAIN | DFUNC:DFUNC | DECLAFF:DECLAFF | DECLAFF:DECLAFF | DECL:DECL | AFF:AFF ;
+
+
+
+(* __Instructions__ *)
+
+BLOCK = '{' @:EMPTY '}' | '{' ({@+:INSTR}+ | @:NULL) '}' ;
+
+INSTR = @:COND | @:OTHER  ';' | CFUNC:CFUNC ';' | @:DEFS ;
+
+COND = IF:IF | ELSE:ELSE | ELIF:ELIF | WHILE:WHILE | DOWHILE:DOWHILE ;
+
+DECL = TYPE:TYPE NAME:nom ';' ;
+
+DECLAFF = TYPE:TYPE NAME:nom '=' EXPR:EXPR ';' ;
+
+AFF = NAME:nom '=' EXPR:EXPR ';' ;
+
+CFUNC = NAME:nom ARGS:ARGS ;
+
+OTHER = RETURN:RETURN | BREAK:BREAK | ECHO:ECHO | ECHOLN:ECHOLN ;
+
+RETURN = 'return' '(' EXPR:EXPR ')' | 'return' '(' @:EMPTY ')' ;
+
+BREAK = 'break' @:EMPTY ;
+
+ECHO = 'echo' '(' EXPR:EXPR ')' ;
+
+ECHOLN = 'echoln' '(' EXPR:EXPR ')' ;
+
+
+(* __Conditions__ *)
+
+IF = 'if' '(' EXPR:EXPR ')' BLOCK:BLOCK ; 
+
+ELSE = 'else' BLOCK:BLOCK ; 
+
+ELIF = 'elif' '(' EXPR:EXPR ')' BLOCK:BLOCK ;
+
+WHILE = 'while' '(' EXPR:EXPR ')' BLOCK:BLOCK ; 
+
+DOWHILE = 'do' BLOCK:BLOCK 'while' '(' EXPR:EXPR ')' ;
+
+
+
+(* __Paramètres Arguments__ *)
+
+PARAM = '(' @:EMPTY ')' | '(' [@:_TYPE @:_nom {',' @:_TYPE @:_nom}*] ')' ;
+
+ARGS = '(' @:EMPTY ')' | '(' [@+:_EXPR {',' @+:_EXPR}*] ')' ;
+
+EMPTY = {} ;
+
+
+
+(* __Objets Fonctions__ *)
+
+DOBJT = 'class' NAME:nom '{' {BLOCK+:DMEMB}* '}' ;
+
+DMEMB = CLASSDFUNC:DFUNC | DECLAFF:DECLAFF | CLASSDECL:DECL | CSTR:CSTR;
+
+DFUNC = 'func' TYPE:TYPE NAME:nom PARAM:PARAM BLOCK:BLOCK ;
+
+DMAIN = TYPE:TYPE NAME:'Main' PARAM:PARAM BLOCK:BLOCK ;
+
+CSTR = NAME:nom PARAM:PARAM BLOCK:BLOCK ;
+
+
+
+(* __Types Opérateurs__ *)
+
+TYPE = @:PTYPE | @:nom ;
+
+OPER = '.' | '+' | '-' | '*' | '/' | '==' | '!=' | '>' | '<'| '>=' | '<='| 'or' | 'and' ;
+
+PTYPE = 'int' | 'float' | 'string' | 'void' | 'bool' ;
+
+KEYW =  @:PTYPE | 'return' | 'back' | 'or' | 'and' | 'class' | 'func' | 'echo' | 'echoln' | 'Main' | 'true' | 'false' ;
+
+
+
+(* __Expressions__ *)
+
+EXPR = @:or_EXPR ;
+
+or_EXPR = @:and_EXPR {@:'or' @:and_EXPR}* ;
+
+and_EXPR = @:e_EXPR {@:'and' @:e_EXPR}* ;
+
+e_EXPR = @:a_EXPR {@:('==' | '!=' | '>=' | '<=' | '>' | '<') @:a_EXPR}* ;
+
+a_EXPR = @:m_EXPR {@:('+' | '-') @:m_EXPR}* ;
+
+m_EXPR = @:p_EXPR {@:('*' | '/') @:p_EXPR}* ;
+
+p_EXPR = @:t_EXPR {@:('.') @:t_EXPR}* ;
+
+t_EXPR = '(' PARENTH:EXPR ')' | TRUE:'true' | FALSE:'false' | CFUNC:CFUNC | NAME:nom | VAL:val ;
+   
+nom = !KEYW /[a-zA-Z_][a-zA-Z0-9_]*/ ;
+
+val = /[0-9]+[.]?[0-9]*/ | /['].*[']/ ;
+
+
+
+(* __Autres__ *)
+
+NULL = @:() ;
+
+_DFUNC = DFUNC:DFUNC ;
+
+_DECLAFF = DECLAFF:DECLAFF ;
+
+_DECL = DECL:DECL ;
+
+_TYPE = TYPE:TYPE ;
+
+_nom = NAME:nom ;
+
+_CSTR = CSTR:CSTR ;
+
+_EXPR = EXPR:EXPR ;
+

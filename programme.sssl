@@ -1,0 +1,10 @@
+void Main() 
+{
+    string a = 'adele' + 'est' + 'geniale';
+    echoln(a);
+    a = 'Wei Wei';
+    echoln(a+' est super');
+    string b = 'Popek';
+    string c = ' sont des genies';
+    echoln(a+' et '+ b + c );
+}
