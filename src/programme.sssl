@@ -17,6 +17,8 @@ class B
     B(int b)
     {
         int a = 4;
+        A prout;
+        prout = this.clA;
     }
 }
 

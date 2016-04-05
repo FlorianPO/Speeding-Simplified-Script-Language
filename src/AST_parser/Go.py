@@ -47,9 +47,13 @@ def init():
     SUP()
     INFEGAL()
     SUPEGAL()
+    OR()
+    AND()
 
     NAME()
     VALUE()
+    TRUE()
+    FALSE()
     TYPE()
 
     ADD()
@@ -163,7 +167,7 @@ def BLOCK():
            global _INDENT_
            _PREVIOUS_INDENT_ = _INDENT_
            _INDENT_ = _INDENT_ + "\t"
-           string = _PREVIOUS_INDENT_ + "{\n"
+           string = " {\n"
            for i in range(0, _size):
                string = string + _INDENT_ + self.instr_list[i].__go__() + "\n"
            string = string + _PREVIOUS_INDENT_ + "}"
@@ -178,15 +182,13 @@ def BLOCK():
 def CLASSDEF():
     def __go__(self):
         meth_list = []
-
         i = 0
         while i < len(self.block.instr_list):
             if isinstance(self.block.instr_list[i], MethodDef):
-                print(i)
                 meth_list.append(self.block.instr_list[i])
                 del self.block.instr_list[i]
                 i = i-1
-            i = i+1
+            i=i+1
         
         string = ""
         for i in range(0, len(meth_list)):
@@ -243,6 +245,16 @@ def SUPEGAL():
         return self.expr1.__go__() + " >= " + self.expr2.__go__()
     SupEgal.__go__ = __go__
 
+def OR():
+    def __go__(self):
+        return self.expr1.__go__() + " || " + self.expr2.__go__()
+    Or.__go__ = __go__
+    
+def AND():
+    def __go__(self):
+        return self.expr1.__go__() + " && " + self.expr2.__go__()
+    And.__go__ = __go__
+
 def IF():
     def __go__(self):
         return "if " + self.expr.__go__() + self.block.__go__()
@@ -280,6 +292,16 @@ def VALUE():
         else :
             return self.__str__()
     Value.__go__ = __go__
+
+def TRUE():
+    def __go__(self):
+        return self.__str__()
+    TTrue.__go__ = __go__
+
+def FALSE():
+    def __go__(self):
+        return self.__str__()
+    FFalse.__go__ = __go__
 
 def TYPE():
     def __go__(self):

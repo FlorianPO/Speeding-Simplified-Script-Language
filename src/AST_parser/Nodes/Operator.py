@@ -32,7 +32,7 @@ class Operator(Expression):
 class Add(Operator): # Addition
     def __init__(self, data):
         Operator.__init__(self, data)
-        self.compability = ["int", "float"]
+        self.compability = ["int", "float", "string"]
     def __str__(self):
         return self.expr1.__str__() + " + " + self.expr2.__str__()
 class Sub(Operator): # Substraction

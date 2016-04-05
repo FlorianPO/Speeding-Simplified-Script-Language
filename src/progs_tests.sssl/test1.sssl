@@ -1,6 +1,20 @@
 void Main() 
 {
-    int a;
-    int a = 13;
-    
+    echoln('Test '+'1 :');
+    float a;
+    int b = 13;
+    echo('b = ');echoln(b);
+    a = 15.3;
+    echoln(15);
+    echo('a = '); echoln(a);
+    int c = b + 15;
+    echo('c = ');echoln(c);
+    c = c - b;
+    echo('c = ');echoln(c);
+    c = 4 / 2;
+    echo('c = ');echoln(c);
+    bool test = true;
+    echoln(test);
+    string blabla = 'hello';
+    echoln(blabla);
 }

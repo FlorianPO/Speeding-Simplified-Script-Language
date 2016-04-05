@@ -74,6 +74,40 @@ class Value(Expression):
     def __str__(self):
         return self.value_s
 
+class TTrue(Expression):
+    def __init__(self, data):
+        Expression.__init__(self, data)
+
+    def fill(self, check = True):
+        if (not self.filled):
+            if (check):
+                self.data.Handler.checkString(self.node_name) # check for the right statement
+            self.value_s = self.data.Handler.next_string()
+            self.filled = True
+
+    def getType(self):
+        return Type(self.data, "bool")
+
+    def __str__(self):
+        return self.value_s
+
+class FFalse(Expression):
+    def __init__(self, data):
+        Expression.__init__(self, data)
+
+    def fill(self, check = True):
+        if (not self.filled):
+            if (check):
+                self.data.Handler.checkString(self.node_name) # check for the right statement
+            self.value_s = self.data.Handler.next_string()
+            self.filled = True
+
+    def getType(self):
+        return Type(self.data, "bool")
+
+    def __str__(self):
+        return self.value_s
+
 
 
 # Defines a type

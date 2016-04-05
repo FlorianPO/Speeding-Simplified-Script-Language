@@ -5,7 +5,8 @@ func int add(int a, int b)
 
 func float additionFloat(float a, float b)
 {
-	return(a+b);
+	float c = a+b;
+	return(c);
 }
 
 func int sous(int a, int b)
@@ -20,16 +21,16 @@ func int diff(int a, int b, int c)
 
 void Main()
 {
-	echo('Test 4 :');
+	echoln('Test 4 :');
 	int a=10;
 	int b=5;
 	int c= 4;
 	float d=3.5;
 	float e = 2.6;
 	a=add(a,b);
-	echo(a);
+	echo('a = '); echoln(a);
 	d=additionFloat(d,e);
-	echo(d);
+	echo('d = '); echoln(d);
 	a=diff(a,b,c);
-	echo(a);
+	echo('a = '); echoln(a);
 }

@@ -23,7 +23,7 @@ class Data:
                            "RETURN": Return, "BREAK": Break, "ECHO": Echo, "ECHOLN": Echoln}
 
         self.type_list = ["int", "float", "string", "void", "bool"]
-        self.expr_dict = {"EXPR": Expression, "TYPE": Type, "NAME": Name, "VAL": Value}
+        self.expr_dict = {"EXPR": Expression, "TYPE": Type, "TRUE": TTrue, "FALSE": FFalse, "NAME": Name, "VAL": Value}
         self.oper_dict = {"+": Add, "-": Sub, "*": Mul, "/": Div, ".": Access, "==": Equal, "!=": NEqual,
                           "<=": InfEgal, ">=": SupEgal, "<": Inf, ">": Sup, "or": Or, "and": And}
         self.other_dict = {"PARAM": Parameters, "ARGS": Arguments, "BLOCK": Block, "PARENTH": Parenthese}

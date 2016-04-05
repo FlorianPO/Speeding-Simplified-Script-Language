@@ -1,0 +1,48 @@
+
+  "BLOCK": [
+      "DMAIN":  
+        "TYPE": "void" 
+        "NAME": "Main" 
+        "PARAM": [] 
+        "BLOCK": [
+            "DECLAFF":  
+              "TYPE": "string" 
+              "NAME": "a" 
+              "EXPR":  
+                "VAL": "'adele' + 'est' + 'geniale'" 
+            "ECHOLN":  
+              "EXPR":  
+                "NAME": "a" 
+            "AFF":  
+              "NAME": "a" 
+              "EXPR":  
+                "VAL": "'Wei Wei'" 
+            "ECHOLN":  
+              "EXPR": [
+                  "NAME": "a" 
+                "+" 
+                  "VAL": "' est super'" 
+              ]
+            "DECLAFF":  
+              "TYPE": "string" 
+              "NAME": "b" 
+              "EXPR":  
+                "VAL": "'Popek'" 
+            "DECLAFF":  
+              "TYPE": "string" 
+              "NAME": "c" 
+              "EXPR":  
+                "VAL": "' sont des genies'" 
+            "ECHOLN":  
+              "EXPR": [
+                  "NAME": "a" 
+                "+" 
+                  "VAL": "' et '" 
+                "+" 
+                  "NAME": "b" 
+                "+" 
+                  "NAME": "c" 
+              ]
+        ]
+  ]
+
