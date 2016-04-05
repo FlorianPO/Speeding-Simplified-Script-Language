@@ -178,11 +178,15 @@ def BLOCK():
 def CLASSDEF():
     def __go__(self):
         meth_list = []
-        for i in range(0, len(self.block.instr_list)):
+
+        i = 0
+        while i < len(self.block.instr_list):
             if isinstance(self.block.instr_list[i], MethodDef):
+                print(i)
                 meth_list.append(self.block.instr_list[i])
                 del self.block.instr_list[i]
                 i = i-1
+            i = i+1
         
         string = ""
         for i in range(0, len(meth_list)):

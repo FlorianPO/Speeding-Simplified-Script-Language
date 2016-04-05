@@ -58,7 +58,7 @@ class MethodDef(FunctionDef):
         data.Block = self.block.parent # retrieve old block
         data.Block.add("this", Type(data, self.name.__str__())) # add this
         
-        data.Block.parent.addFunction(self.name.__str__(), self.parm.__key__(), Type(data, self.name.__str__())) # add constructor to environment of the class
+        data.Block.parent.addFunction(self.name.__str__(), self.parm.__key__(), self.type) # add constructor to environment of the class
         self.block.fill()
         
     def __str__(self):
