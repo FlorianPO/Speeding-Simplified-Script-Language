@@ -9,4 +9,5 @@ clean:
 	rm -f -r ./Nodes/__pycache__
 
 mrproper: clean
+	rm -f -r programResult.go
 	

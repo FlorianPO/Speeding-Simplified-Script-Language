@@ -24,7 +24,7 @@ class Data:
 
         self.type_list = ["int", "float", "string", "void", "bool"]
         self.expr_dict = {"EXPR": Expression, "TYPE": Type, "NAME": Name, "VAL": Value}
-        self.oper_dict = {"+": Add, "-": Sub, "*": Mul, "/": Div, ".": Access, "==": Equal, "!=": NEqual, "or": Or, "and": And}
+        self.oper_dict = {"+": Add, "-": Sub, "*": Mul, "/": Div, ".": Access, "==": Equal, "!=": NEqual, "<": Inf, ">": Sup, "or": Or, "and": And}
         self.other_dict = {"PARAM": Parameters, "ARGS": Arguments, "BLOCK": Block, "PARENTH": Parenthese}
 
         self.all_dict = {}

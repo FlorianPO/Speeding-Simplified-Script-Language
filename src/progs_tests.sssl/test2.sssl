@@ -1,0 +1,17 @@
+void Main() 
+{
+    echo('Test 2 :');
+    int a;
+    int b = 13;
+    echo(b);
+    a = 15;
+    echo(15);
+    a = b;
+    echo(a);
+    int c = a + 15;
+    echo(c);
+    c = c - a;
+    echo(c);
+    c = 4 / 2;
+    echo(c);
+}

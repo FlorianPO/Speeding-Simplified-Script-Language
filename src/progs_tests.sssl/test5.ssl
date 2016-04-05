@@ -1,4 +1,4 @@
-class A 
+Class A 
 {
 	func int meth(int a, int b)
 	{
@@ -7,7 +7,7 @@ class A
 	}
 }
 
-class B 
+Class B 
 {
 	A clA;
 	func B methode(int a, int b, int c)
@@ -25,3 +25,6 @@ void Main()
     B b = B(4);    
     int c = b.methode(1, 2, 3).clA.meth(3 + 2, 3);
 }
+
+
+

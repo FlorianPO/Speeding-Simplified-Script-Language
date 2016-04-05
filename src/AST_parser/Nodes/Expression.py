@@ -74,6 +74,8 @@ class Value(Expression):
     def __str__(self):
         return self.value_s
 
+
+
 # Defines a type
 class Type(Node):
     def __init__(self, data, keyword = None):
@@ -126,4 +128,6 @@ def findExpr(data):
 def findType(data, string):
     if (string.find('.') >= 0):
         return Type(data, "float")
+    elif (string.find("'") >=0):
+        return Type(data, "string")
     return Type(data, "int")

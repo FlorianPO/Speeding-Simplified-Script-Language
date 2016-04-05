@@ -1,0 +1,98 @@
+﻿Nom du test
+Supposé marcher
+en AST
+Supposé marcher
+en GO
+Fonctions testées
+Résultats attendu
+Test1
+NON : variable déclarée 2 fois
+
+Déclaration
+ERREUR
+Test2
+OUI
+OUI
+Affectations
+Déclarations
+opérateurs +,-,*,/
+fonction echo
+Test 2 :
+13
+15
+13
+28
+15
+2
+test3
+OUI
+OUI
+If,While
+conditions !=,==,<,>
+boucles imbriquées
+Test 3 :
+6
+8
+6
+6
+5
+4
+3
+2
+4
+6
+5
+4
+3
+2
+Test4
+OUI
+OUI
+Fonctions
+Appel de fonction
+return, return d'expression, return d'appel de fonction.
+Test 4 :
+15
+6.1
+6
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Test1 : n'est pas sensé marcher → la variable a est déclarée 2 fois.
+Test2 : est sensé marcher → teste les affectations, déclarations, déclaration+Affectation, les opérateurs +,-,*,/.
+Test3 : est sensé marcher → teste les if/while et les conditions ==/</> (possede une boucle imbriquée)

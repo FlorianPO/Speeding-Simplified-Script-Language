@@ -1,0 +1,31 @@
+void Main() 
+{
+    echo('Test 3 :');
+    int a=14;
+    echo(a);
+    int b;
+    int c=0;
+    if (a==14)
+    {
+	b=a+2;
+	echo(b);
+	
+    }
+    while (b>20)
+    {
+	b=16;
+	echo(13);
+    }
+    while (b!=2)
+    {
+	b=b-2;
+	echo(b);
+	c=c+b;
+	echo(c);
+	while(c>0)
+	{
+		c=c-1;
+		echo(c);
+	}
+    }
+}

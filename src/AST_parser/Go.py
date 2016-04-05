@@ -40,6 +40,8 @@ def init():
     DOWHILE()
     EQUAL()
     NEQUAL()
+    INF()
+    SUP()
 
     NAME()
     VALUE()
@@ -120,7 +122,7 @@ def PARAMETERS():
         string = "("
         for i in range(0, _size-1):
             string = string + self.names[i].__go__() + " " + self.types[i].__go__() + ", "
-        string = string + self.types[_size-1].__go__() + " " + self.names[_size-1].__go__()
+        string = string + self.names[_size-1].__go__() + " " + self.types[_size-1].__go__()
         string = string + ")"
 
         return string
@@ -186,6 +188,16 @@ def NEQUAL():
     def __go__(self):
         return self.expr1.__go__() + " != " + self.expr2.__go__()
     NEqual.__go__ = __go__
+ 
+def INF():
+    def __go__(self):
+        return self.expr1.__go__() + " < " + self.expr2.__go__()
+    Inf.__go__ = __go__
+
+def SUP():
+    def __go__(self):
+        return self.expr1.__go__() + " > " + self.expr2.__go__()
+    Sup.__go__ = __go__
 
 def IF():
     def __go__(self):
@@ -219,12 +231,18 @@ def NAME():
 
 def VALUE():
     def __go__(self):
-        return self.__str__()
+        if(self.getType().__str__() == "string"):
+            return '"'+self.__str__()[1:-1]+'"'
+        else :
+            return self.__str__()
     Value.__go__ = __go__
 
 def TYPE():
     def __go__(self):
-        return self.__str__()
+        if (self.__str__() == "float"):
+            return self.__str__() + "32"
+        else:
+            return self.__str__()
     Type.__go__ = __go__
 
 def ADD():

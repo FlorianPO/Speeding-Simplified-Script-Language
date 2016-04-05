@@ -10,25 +10,25 @@ DEFS = DOBJT:DOBJT | DMAIN:DMAIN | DFUNC:DFUNC | DECLAFF:DECLAFF | DECLAFF:DECLA
 
 BLOCK = '{' @:EMPTY '}' | '{' ({@+:INSTR}+ | @:NULL) '}' ;
 
-INSTR = @:COND | @:OTHER | CFUNC:CFUNC | @:DEFS ;
+INSTR = @:COND | @:OTHER  ';' | CFUNC:CFUNC ';' | @:DEFS ;
 
 COND = IF:IF | ELSE:ELSE | ELIF:ELIF | WHILE:WHILE | DOWHILE:DOWHILE ;
 
-DECL = TYPE:TYPE NAME:nom ;
+DECL = TYPE:TYPE NAME:nom ';' ;
 
-DECLAFF = TYPE:TYPE NAME:nom '=' EXPR:EXPR ;
+DECLAFF = TYPE:TYPE NAME:nom '=' EXPR:EXPR ';' ;
 
-AFF = NAME:nom '=' EXPR:EXPR ;
+AFF = NAME:nom '=' EXPR:EXPR ';' ;
 
 CFUNC = NAME:nom ARGS:ARGS ;
 
 OTHER = RETURN:RETURN | BREAK:BREAK | ECHO:ECHO ;
 
-RETURN = 'return' EXPR:EXPR | 'return' @:EMPTY ;
+RETURN = 'return' '(' EXPR:EXPR ')' | 'return' '(' @:EMPTY ')' ;
 
 BREAK = 'break' @:EMPTY ;
 
-ECHO = 'echo' EXPR:EXPR ;
+ECHO = 'echo' '(' EXPR:EXPR ')' ;
 
 
 
@@ -74,11 +74,11 @@ CSTR = NAME:nom PARAM:PARAM BLOCK:BLOCK ;
 
 TYPE = @:PTYPE | @:nom ;
 
-OPER = '.' | '+' | '-' | '*' | '/' | '==' | '!=' | 'or' | 'and' ;
+OPER = '.' | '+' | '-' | '*' | '/' | '==' | '!=' | '>' | '<'| 'or' | 'and' ;
 
 PTYPE = 'int' | 'float' | 'string' | 'void' | 'bool' ;
 
-KEYW =  @:PTYPE | 'return' | 'back' | 'or' | 'and' | 'class' | 'func' | 'echo' ;
+KEYW =  @:PTYPE | 'return' | 'back' | 'or' | 'and' | 'class' | 'func' | 'echo' | 'Main';
 
 
 
@@ -90,7 +90,7 @@ or_EXPR = @:and_EXPR {@:'or' @:and_EXPR}* ;
 
 and_EXPR = @:e_EXPR {@:'and' @:e_EXPR}* ;
 
-e_EXPR = @:a_EXPR {@:('==' | '!=') @:a_EXPR}* ;
+e_EXPR = @:a_EXPR {@:('==' | '!=' | '>' | '<') @:a_EXPR}* ;
 
 a_EXPR = @:m_EXPR {@:('+' | '-') @:m_EXPR}* ;
 
@@ -98,11 +98,11 @@ m_EXPR = @:p_EXPR {@:('*' | '/') @:p_EXPR}* ;
 
 p_EXPR = @:t_EXPR {@:('.') @:t_EXPR}* ;
 
-t_EXPR = '(' PARENTH:EXPR ')' | CFUNC:CFUNC | NAME:nom | VAL:val ;
+t_EXPR = '(' PARENTH:EXPR ')' | CFUNC:CFUNC | NAME:nom | VAL:val;
    
 nom = !KEYW /[a-zA-Z_][a-zA-Z0-9_]*/ ;
 
-val = /[0-9]+[.]?[0-9]*/ | /["][\d]?["]*/;
+val = /[0-9]+[.]?[0-9]*/ |  /['].*[']/ ;
 
 
 
