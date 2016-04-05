@@ -16,15 +16,16 @@ from Nodes.FunctionSystem import *
 class Data:
     def __init__(self):
         # LISTS ___________________________________
-        self.instr_dict = {"DECL": Declaration, "AFF": Affectation, "DECLAFF": Declaffectation, 
-                           "DFUNC": FunctionDef, "DMAIN": DMain, "CFUNC": FunctionCall,
+        self.instr_dict = {"DECL": Declaration, "AFF": Affectation, "DECLAFF": Declaffectation, "CLASSDECL": DeclarationInClass,
+                           "DFUNC": FunctionDef, "DMAIN": DMain, "CFUNC": FunctionCall, "CLASSDFUNC": MethodDef,
                            "IF": If, "ELSE": Else, "ELIF": Elif, "WHILE": While, "DOWHILE": DoWhile,
                            "DOBJT": ClassDef, "CSTR": ConstructorDef,
-                           "RETURN": Return, "BREAK": Break, "ECHO": Echo}
+                           "RETURN": Return, "BREAK": Break, "ECHO": Echo, "ECHOLN": Echoln}
 
         self.type_list = ["int", "float", "string", "void", "bool"]
         self.expr_dict = {"EXPR": Expression, "TYPE": Type, "NAME": Name, "VAL": Value}
-        self.oper_dict = {"+": Add, "-": Sub, "*": Mul, "/": Div, ".": Access, "==": Equal, "!=": NEqual, "<": Inf, ">": Sup, "or": Or, "and": And}
+        self.oper_dict = {"+": Add, "-": Sub, "*": Mul, "/": Div, ".": Access, "==": Equal, "!=": NEqual,
+                          "<=": InfEgal, ">=": SupEgal, "<": Inf, ">": Sup, "or": Or, "and": And}
         self.other_dict = {"PARAM": Parameters, "ARGS": Arguments, "BLOCK": Block, "PARENTH": Parenthese}
 
         self.all_dict = {}
@@ -34,9 +35,10 @@ class Data:
         # CONTENT ___________________________________
         self.Logger = Logger("Default logger")
         self.Handler = Handler("Default handler", self.Logger)
-        self.GlobalBlock = Block(None, self, "GLo")
+        self.GlobalBlock = Block(None, self)
         self.Block = None # current parsing block
         self._class = None
+        self._class_name = None
 
         # OPTIONS ___________________________________
         self.check_type_compability = False

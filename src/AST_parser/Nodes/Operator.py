@@ -105,6 +105,26 @@ class Sup(Operator):
     def getType(self):
        return Type(self.data, "bool")
 
+class InfEgal(Operator):
+    def __init__(self, data):
+        Operator.__init__(self, data)
+        self.compability = ["int", "float"]
+    def __str__(self):
+        return self.expr1.__str__() + " <= " + self.expr2.__str__()
+
+    def getType(self):
+       return Type(self.data, "bool")
+
+class SupEgal(Operator):
+    def __init__(self, data):
+        Operator.__init__(self, data)
+        self.compability = ["int", "float"]
+    def __str__(self):
+        return self.expr1.__str__() + " >= " + self.expr2.__str__()
+
+    def getType(self):
+       return Type(self.data, "bool")
+
 class Or(Operator):
     def __init__(self, data):
         Operator.__init__(self, data)

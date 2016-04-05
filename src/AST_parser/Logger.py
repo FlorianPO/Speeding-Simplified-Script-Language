@@ -2,7 +2,7 @@
 
 # Parsing logger
 class Logger:
-    def __init__(self, name, trace=False):
+    def __init__(self, name, trace=True):
         self.trace = trace
         self.name = name
         self.log_list = []

@@ -8,7 +8,7 @@ from Nodes.Node import *
 
 # Define a block of instructions, and so an environment
 class Block(Node):
-    def __init__(self, parent, data, naede="rien"):
+    def __init__(self, parent, data):
         Node.__init__(self, data)
         self.parent = parent # super environment
         self.instr_list = [] # instructions inside the block

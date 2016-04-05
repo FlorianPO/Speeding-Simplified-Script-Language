@@ -17,12 +17,15 @@ def init():
     DECLARATION()
     DECLAFFECTATION()
     AFFECTATION()
+    DECLARATIONINCLASS()
     
     FUNCTIONDEF()
+    METHODEDEF()
     DMAIN()
     CONSTRUCTORDEF()
     FUNCTIONCALL()
     ECHO()
+    ECHOLN()
     ARGUMENTS()
     PARAMETERS()
     BLOCK()
@@ -42,6 +45,8 @@ def init():
     NEQUAL()
     INF()
     SUP()
+    INFEGAL()
+    SUPEGAL()
 
     NAME()
     VALUE()
@@ -55,8 +60,13 @@ def init():
     
 def DECLARATION():
     def __go__(self):
-        return "var " + self.name.__go__() + " "+self.type.__go__()
+        return "var " + self.name.__go__() + " " + self.type.__go__()
     Declaration.__go__ = __go__
+    
+def DECLARATIONINCLASS():
+    def __go__(self):
+        return self.name.__go__() + " " + self.type.__go__()
+    DeclarationInClass.__go__ = __go__
 
 def AFFECTATION():
     def __go__(self):
@@ -75,17 +85,29 @@ def FUNCTIONCALL():
 
 def ECHO():
     def __go__(self):
-        return "fmt.Println(" + self.expr.__go__() + ")"
+        return "fmt.Print(" + self.expr.__go__() + ")"
     Echo.__go__ = __go__
 
+def ECHOLN():
+    def __go__(self):
+        return "fmt.Println(" + self.expr.__go__() + ")"
+    Echoln.__go__ = __go__
 
 def FUNCTIONDEF():
     def __go__(self):
         string = "func " + self.name.__go__() + self.parm.__go__()
         if(self.type.__str__() != "void"):
             string = string + " " + self.type.__go__()
-        return string  + self.block.__go__()
+        return string  + " " + self.block.__go__()
     FunctionDef.__go__ = __go__
+    
+def METHODEDEF():
+    def __go__(self):
+        string = "func (this " + self.class_name + ") " + self.name.__go__() + self.parm.__go__()
+        if (self.type.__str__() != "void"):
+            string = string + " " + self.type.__go__()
+        return string + " " + self.block.__go__()
+    MethodDef.__go__ = __go__
 
 def DMAIN():
     def __go__(self):
@@ -129,14 +151,13 @@ def PARAMETERS():
     Parameters.__go__ = __go__
 
 def BLOCK():
-    def __go__(self,accolade=True):
+    def __go__(self, accolade=True):
         _size = len(self.instr_list)
 
         if (_size == 0 and accolade):
             return " {}"
         elif (_size == 0):
             return ""
-       
        
         if (accolade):
            global _INDENT_
@@ -154,11 +175,20 @@ def BLOCK():
         return string
     Block.__go__ = __go__
 
-
-
 def CLASSDEF():
     def __go__(self):
-        return "class " + self.name.__go__() + self.block.__go__()
+        meth_list = []
+        for i in range(0, len(self.block.instr_list)):
+            if isinstance(self.block.instr_list[i], MethodDef):
+                meth_list.append(self.block.instr_list[i])
+                del self.block.instr_list[i]
+                i = i-1
+        
+        string = ""
+        for i in range(0, len(meth_list)):
+            string = string + meth_list[i].__go__() + "\n"
+            
+        return "type " + self.name.__go__() + " struct" + self.block.__go__() + "\n" + string
     ClassDef.__go__ = __go__
 
 def ACCESS():
@@ -198,6 +228,16 @@ def SUP():
     def __go__(self):
         return self.expr1.__go__() + " > " + self.expr2.__go__()
     Sup.__go__ = __go__
+
+def INFEGAL():
+    def __go__(self):
+        return self.expr1.__go__() + " <= " + self.expr2.__go__()
+    InfEgal.__go__ = __go__
+
+def SUPEGAL():
+    def __go__(self):
+        return self.expr1.__go__() + " >= " + self.expr2.__go__()
+    SupEgal.__go__ = __go__
 
 def IF():
     def __go__(self):

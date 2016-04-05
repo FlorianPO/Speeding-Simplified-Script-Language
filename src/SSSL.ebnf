@@ -22,7 +22,7 @@ AFF = NAME:nom '=' EXPR:EXPR ';' ;
 
 CFUNC = NAME:nom ARGS:ARGS ;
 
-OTHER = RETURN:RETURN | BREAK:BREAK | ECHO:ECHO ;
+OTHER = RETURN:RETURN | BREAK:BREAK | ECHO:ECHO | ECHOLN:ECHOLN ;
 
 RETURN = 'return' '(' EXPR:EXPR ')' | 'return' '(' @:EMPTY ')' ;
 
@@ -30,6 +30,7 @@ BREAK = 'break' @:EMPTY ;
 
 ECHO = 'echo' '(' EXPR:EXPR ')' ;
 
+ECHOLN = 'echoln' '(' EXPR:EXPR ')' ;
 
 
 (* __Conditions__ *)
@@ -60,7 +61,7 @@ EMPTY = {} ;
 
 DOBJT = 'class' NAME:nom '{' {BLOCK+:DMEMB}* '}' ;
 
-DMEMB = DFUNC:DFUNC | DECLAFF:DECLAFF | DECL:DECL | CSTR:CSTR;
+DMEMB = CLASSDFUNC:DFUNC | DECLAFF:DECLAFF | CLASSDECL:DECL | CSTR:CSTR;
 
 DFUNC = 'func' TYPE:TYPE NAME:nom PARAM:PARAM BLOCK:BLOCK ;
 
@@ -74,11 +75,11 @@ CSTR = NAME:nom PARAM:PARAM BLOCK:BLOCK ;
 
 TYPE = @:PTYPE | @:nom ;
 
-OPER = '.' | '+' | '-' | '*' | '/' | '==' | '!=' | '>' | '<'| 'or' | 'and' ;
+OPER = '.' | '+' | '-' | '*' | '/' | '==' | '!=' | '>' | '<'| '>=' | '<='| 'or' | 'and' ;
 
 PTYPE = 'int' | 'float' | 'string' | 'void' | 'bool' ;
 
-KEYW =  @:PTYPE | 'return' | 'back' | 'or' | 'and' | 'class' | 'func' | 'echo' | 'Main';
+KEYW =  @:PTYPE | 'return' | 'back' | 'or' | 'and' | 'class' | 'func' | 'echo' | 'echoln' | 'Main' ;
 
 
 
@@ -90,7 +91,7 @@ or_EXPR = @:and_EXPR {@:'or' @:and_EXPR}* ;
 
 and_EXPR = @:e_EXPR {@:'and' @:e_EXPR}* ;
 
-e_EXPR = @:a_EXPR {@:('==' | '!=' | '>' | '<') @:a_EXPR}* ;
+e_EXPR = @:a_EXPR {@:('==' | '!=' | '>=' | '<=' | '>' | '<') @:a_EXPR}* ;
 
 a_EXPR = @:m_EXPR {@:('+' | '-') @:m_EXPR}* ;
 
@@ -98,11 +99,11 @@ m_EXPR = @:p_EXPR {@:('*' | '/') @:p_EXPR}* ;
 
 p_EXPR = @:t_EXPR {@:('.') @:t_EXPR}* ;
 
-t_EXPR = '(' PARENTH:EXPR ')' | CFUNC:CFUNC | NAME:nom | VAL:val;
+t_EXPR = '(' PARENTH:EXPR ')' | CFUNC:CFUNC | NAME:nom | VAL:val ;
    
 nom = !KEYW /[a-zA-Z_][a-zA-Z0-9_]*/ ;
 
-val = /[0-9]+[.]?[0-9]*/ |  /['].*[']/ ;
+val = /[0-9]+[.]?[0-9]*/ | /['].*[']/ ;
 
 
 
